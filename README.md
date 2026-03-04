@@ -149,6 +149,26 @@ PINATA_JWT=YOUR_PINATA_JWT_HERE
 
 Save the file.
 
+### Start the NFT Mint Server
+
+After adding your Pinata JWT, start the NFT mint backend server.
+
+Navigate to the server folder:
+
+```
+projects/TokenizeRWATemplate-contracts/NFT_mint_server
+```
+
+Run the server:
+
+```
+bash npm start 
+```
+Important (Codespaces / Remote Environments)
+
+
+### Lastly, open the Ports tab and change/make sure Port 3000 to Public
+
 ---
 
 ## 🌐 Starting the app again
