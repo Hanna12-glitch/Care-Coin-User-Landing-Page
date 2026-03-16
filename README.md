@@ -162,7 +162,7 @@ projects/TokenizeRWATemplate-contracts/NFT_mint_server
 Run the server:
 
 ```
-bash npm start 
+npm run dev
 ```
 Important (Codespaces / Remote Environments)
 
