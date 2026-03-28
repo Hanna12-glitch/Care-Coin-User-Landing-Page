@@ -11,11 +11,8 @@ export default function Layout() {
 
   const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
 
-  // Check if wallet is connected - activeAddress is the primary indicator
-  // isActive might be undefined for Web3Auth, so we check activeAddress
   const isConnected = Boolean(activeAddress)
 
-  // Helper to format address: "ZBC...WXYZ"
   const displayAddress = isConnected && activeAddress ? ellipseAddress(activeAddress, 4) : 'Sign in'
 
   return (
@@ -23,23 +20,20 @@ export default function Layout() {
       {/* Navbar */}
       <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <NavLink to="/" className="text-2xl font-bold text-slate-900 dark:text-white hover:text-teal-600 transition">
-            TokenizeRWA
+          <NavLink to="/" className="text-2xl font-bold text-[#141938] dark:text-white hover:text-[#1333fa] transition">
+            Project Care Coin
           </NavLink>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation — only Home */}
           <div className="hidden sm:flex items-center gap-8">
-            {['Home', 'Tokenize'].map((item) => (
-              <NavLink
-                key={item}
-                to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
-                className={({ isActive }) =>
-                  `text-sm font-semibold transition ${isActive ? 'text-teal-600' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`
-                }
-              >
-                {item}
-              </NavLink>
-            ))}
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-sm font-semibold transition ${isActive ? 'text-[#1333fa]' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`
+              }
+            >
+              Home
+            </NavLink>
           </div>
 
           <div className="flex items-center gap-4">
@@ -51,7 +45,7 @@ export default function Layout() {
               className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-sm transition shadow-sm border ${
                 isConnected
                   ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
-                  : 'bg-teal-600 border-teal-600 text-white hover:bg-teal-700'
+                  : 'bg-[#1333fa] border-[#1333fa] text-white hover:bg-[#fa1179]'
               }`}
             >
               {isConnected && <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />}
@@ -66,19 +60,19 @@ export default function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12 px-6 border-t border-slate-800">
+      <footer className="bg-[#141938] text-slate-400 py-12 px-6 border-t border-slate-800">
         <div className="max-w-7xl mx-auto grid gap-8 md:grid-cols-3">
           <div>
-            <div className="text-xl font-bold text-white mb-3">TokenizeRWA</div>
-            <p className="text-sm">POC template for tokenizing real-world assets on Algorand.</p>
+            <div className="text-xl font-bold text-white mb-3">Project Care Coin</div>
+            <p className="text-sm">Tokenizing unpaid care work on Algorand.</p>
           </div>
           <div className="text-sm">
             <span className="text-white font-bold block mb-2">Connect</span>
-            <a href="https://lora.algokit.io" target="_blank" className="hover:text-teal-400 transition">
+            <a href="https://lora.algokit.io" target="_blank" className="hover:text-[#fb9b0c] transition">
               Lora Explorer →
             </a>
           </div>
-          <div className="text-xs">© {new Date().getFullYear()} TokenizeRWA. All rights reserved.</div>
+          <div className="text-xs">© {new Date().getFullYear()} Project Care Coin. All rights reserved.</div>
         </div>
       </footer>
 
