@@ -5,7 +5,6 @@ import { useMemo } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './Home'
 import Layout from './Layout'
-import TokenizePage from './TokenizePage'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 // Get Web3Auth client ID from environment
@@ -84,7 +83,7 @@ export default function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
-              <Route path="/tokenize" element={<TokenizePage />} />
+    
             </Route>
           </Routes>
         </BrowserRouter>
