@@ -7,13 +7,8 @@ import Home from './Home'
 import Layout from './Layout'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
-// Get Web3Auth client ID from environment
 const web3AuthClientId = (import.meta.env.VITE_WEB3AUTH_CLIENT_ID ?? '').trim()
 
-/**
- * Build supported wallets list based on env/network.
- * NOTE: Web3Auth defaults to sapphire_mainnet unless web3AuthNetwork is provided.
- */
 function buildSupportedWallets(): SupportedWallet[] {
   if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
     const kmdConfig = getKmdConfigFromViteEnvironment()
@@ -30,22 +25,44 @@ function buildSupportedWallets(): SupportedWallet[] {
     ]
   }
 
-  // TestNet/MainNet wallets
   const wallets: SupportedWallet[] = [{ id: WalletId.PERA }, { id: WalletId.DEFLY }, { id: WalletId.LUTE }]
 
-  // Only add Web3Auth if we actually have a client id
-  // use-wallet v4.4.0+ includes built-in Web3Auth provider
   if (web3AuthClientId) {
     wallets.push({
       id: WalletId.WEB3AUTH,
       options: {
         clientId: web3AuthClientId,
-        web3AuthNetwork: 'sapphire_devnet', // Use 'sapphire_mainnet' for production
+        web3AuthNetwork: 'sapphire_devnet',
         uiConfig: {
-          appName: 'Tokenize RWA Template',
-          mode: 'auto', // 'auto' | 'light' | 'dark'
+          appName: 'Project Care Coin',
+          mode: 'auto',
         },
-      },
+        // Web3Auth v9+ uses 'connectors.auth' (not 'openlogin')
+        modalConfig: {
+          connectors: {
+            auth: {
+              label: 'auth',
+              loginMethods: {
+                google:             { name: 'google',             showOnModal: false },
+                facebook:           { name: 'facebook',           showOnModal: false },
+                reddit:             { name: 'reddit',             showOnModal: false },
+                discord:            { name: 'discord',            showOnModal: false },
+                twitter:            { name: 'twitter',            showOnModal: false },
+                apple:              { name: 'apple',              showOnModal: false },
+                line:               { name: 'line',               showOnModal: false },
+                github:             { name: 'github',             showOnModal: false },
+                kakao:              { name: 'kakao',              showOnModal: false },
+                linkedin:           { name: 'linkedin',           showOnModal: false },
+                twitch:             { name: 'twitch',             showOnModal: false },
+                weibo:              { name: 'weibo',              showOnModal: false },
+                wechat:             { name: 'wechat',             showOnModal: false },
+                sms_passwordless:   { name: 'sms_passwordless',   showOnModal: false },
+                email_passwordless: { name: 'email_passwordless', showOnModal: true  },
+              },
+            },
+          },
+        },
+      } as any,
     })
   }
 
@@ -83,7 +100,6 @@ export default function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
-    
             </Route>
           </Routes>
         </BrowserRouter>

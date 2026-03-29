@@ -1,12 +1,32 @@
 import { useWallet } from '@txnlab/use-wallet-react'
+import { useState } from 'react'
 
 /**
  * Home Page
  * User-facing landing page for Project Care Coin
- * Social login flow — no tokenize/admin features
+ * Social login flow — Web3Auth email passwordless
  */
 export default function Home() {
-  const { activeAddress } = useWallet()
+  const { activeAddress, wallets } = useWallet()
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const web3authWallet = wallets?.find(w => w.id === 'web3auth')
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || !web3authWallet) return
+    setLoading(true)
+    setError('')
+    try {
+      await web3authWallet.connect({ loginProvider: 'email_passwordless', login_hint: email })
+    } catch {
+      setError('Login failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="bg-[#FFD1FF] dark:bg-[#141938]">
@@ -28,33 +48,74 @@ export default function Home() {
             Childcare. Eldercare. Household work. Project Care Coin turns your invisible labour into a verified digital asset — recognised, recorded, and real.
           </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Login Area */}
+          <div className="mt-10">
             {activeAddress ? (
-              <div className="px-10 py-4 rounded-2xl font-bold text-lg bg-[#1333fa] text-white shadow-lg flex items-center gap-2 justify-center">
+              <div className="px-10 py-4 rounded-2xl font-bold text-lg bg-[#1333fa] text-white shadow-lg flex items-center gap-2 justify-center w-fit mx-auto">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                 Wallet connected — your token is ready!
               </div>
             ) : (
-              <div className="px-10 py-4 rounded-2xl font-bold text-lg bg-[#1333fa] text-white shadow-lg cursor-pointer hover:bg-[#fa1179] hover:scale-105 transition">
-                👆 Sign in with the button (top-right)
+              <div className="flex flex-col items-center gap-5">
+
+                {/* Email Login Form */}
+                <form onSubmit={handleEmailLogin} className="w-full max-w-sm flex flex-col gap-3">
+                  <label className="text-sm font-bold text-[#141938] dark:text-white text-center">
+                    Your email address
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="anna@gmail.com"
+                    required
+                    className="w-full px-5 py-3.5 rounded-2xl border-2 border-[#141938]/20 dark:border-white/20 bg-white dark:bg-[#141938] text-[#141938] dark:text-white placeholder:text-[#141938]/30 focus:outline-none focus:border-[#1333fa] transition text-base"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || !email}
+                    className="w-full px-5 py-3.5 rounded-2xl font-bold text-base bg-[#1333fa] text-white hover:bg-[#fa1179] hover:scale-105 transition disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Sending link...
+                      </>
+                    ) : (
+                      '✉️ Sign in with Email'
+                    )}
+                  </button>
+                  {error && (
+                    <p className="text-xs text-[#fa1179] text-center font-medium">{error}</p>
+                  )}
+                  <p className="text-xs text-[#141938]/40 dark:text-slate-500 text-center font-medium">
+                    We'll send you a one-time login link. No password needed.
+                  </p>
+                </form>
+
+                {/* Divider */}
+                <div className="flex items-center gap-4 w-full max-w-sm">
+                  <div className="flex-1 h-px bg-[#141938]/20 dark:bg-white/20" />
+                  <span className="text-xs text-[#141938]/40 dark:text-slate-500 font-medium">or</span>
+                  <div className="flex-1 h-px bg-[#141938]/20 dark:bg-white/20" />
+                </div>
+
+                <a
+                  className="w-full max-w-sm text-center px-10 py-4 bg-white dark:bg-[#141938] border-2 border-[#141938] dark:border-[#FFD1FF]/30 text-[#141938] dark:text-[#FFD1FF] rounded-2xl font-bold text-lg hover:bg-[#1333fa] hover:text-white hover:border-[#1333fa] dark:hover:bg-[#1333fa]/20 transition"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://www.project-care-coin.org"
+                >
+                  Learn more →
+                </a>
+
+                <p className="text-sm text-[#141938]/50 dark:text-slate-400 font-medium">
+                  Free to join. No crypto knowledge needed.
+                </p>
               </div>
             )}
-
-            <a
-              className="px-10 py-4 bg-white dark:bg-[#141938] border-2 border-[#141938] dark:border-[#FFD1FF]/30 text-[#141938] dark:text-[#FFD1FF] rounded-2xl font-bold text-lg hover:bg-[#1333fa] hover:text-white hover:border-[#1333fa] dark:hover:bg-[#1333fa]/20 transition"
-              target="_blank"
-              rel="noreferrer"
-              href="https://www.project-care-coin.org"
-            >
-              Learn more →
-            </a>
           </div>
 
-          {!activeAddress && (
-            <p className="mt-5 text-sm text-[#141938]/50 dark:text-slate-400 font-medium">
-              Free to join. No crypto knowledge needed.
-            </p>
-          )}
         </div>
       </div>
 
@@ -98,7 +159,7 @@ export default function Home() {
                 <div className="min-w-0">
                   <h3 className="text-lg font-extrabold text-[#141938] dark:text-white">Sign In</h3>
                   <p className="mt-1 text-sm text-[#141938]/60 dark:text-slate-300 leading-relaxed">
-                    Use the Sign in button top-right. No app download, no crypto wallet needed.
+                    Enter your email above — no app download, no crypto wallet needed.
                   </p>
                 </div>
               </div>
@@ -232,7 +293,7 @@ export default function Home() {
             <span className="text-[#fb9b0c]">your Care Token?</span>
           </h2>
           <p className="text-lg text-[#FFD1FF]/80 mb-2 max-w-xl mx-auto font-medium leading-relaxed">
-            Sign in with the button at the top-right. It takes 30 seconds.
+            Enter your email above to get started. It takes 30 seconds.
           </p>
           <p className="text-sm text-white/40 mb-10 font-medium">
             No crypto wallet needed. No hidden fees. Just your care, recognised. 💛
@@ -245,7 +306,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="inline-block px-12 py-4 rounded-2xl font-extrabold text-lg bg-white/10 text-white/60 border-2 border-white/20">
-              👆 Use the Sign In button at the top-right
+              👆 Enter your email at the top of the page
             </div>
           )}
         </div>
