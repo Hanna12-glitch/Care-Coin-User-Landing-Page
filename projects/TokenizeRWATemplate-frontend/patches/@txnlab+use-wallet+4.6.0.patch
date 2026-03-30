@@ -1,0 +1,13 @@
+diff --git a/node_modules/@txnlab/use-wallet/dist/index.js b/node_modules/@txnlab/use-wallet/dist/index.js
+index b5e3460..7de29ef 100644
+--- a/node_modules/@txnlab/use-wallet/dist/index.js
++++ b/node_modules/@txnlab/use-wallet/dist/index.js
+@@ -8846,7 +8846,7 @@ var Web3AuthWallet = class extends BaseWallet {
+       privateKeyProvider,
+       uiConfig: this.options.uiConfig
+     });
+-    await web3auth.initModal();
++    await web3auth.initModal({ modalConfig: this.options.modalConfig });
+     this.web3auth = web3auth;
+     this.logger.info("Web3Auth client initialized");
+     return web3auth;
