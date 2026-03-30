@@ -1,4 +1,4 @@
-import { useWallet } from '@txnlab/use-wallet-react'
+import { WalletId, useWallet } from '@txnlab/use-wallet-react'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import ConnectWallet from './components/ConnectWallet'
@@ -6,15 +6,20 @@ import ThemeToggle from './components/ThemeToggle'
 import { ellipseAddress } from './utils/ellipseAddress'
 
 export default function Layout() {
-  const { activeAddress } = useWallet()
+  const { activeAddress, wallets } = useWallet()
+
   const isConnected = Boolean(activeAddress)
   const displayAddress = isConnected && activeAddress ? ellipseAddress(activeAddress, 4) : 'Sign in'
 
   const [openWalletModal, setOpenWalletModal] = useState(false)
   const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
+
+  const handleSignIn = async () => {
+    const web3authWallet = wallets?.find(w => w.id === WalletId.WEB3AUTH)
+    if (web3authWallet) await web3authWallet.connect()
+  }
+
   return (
-
-
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       {/* Navbar */}
       <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm">
@@ -38,7 +43,7 @@ export default function Layout() {
             <ThemeToggle />
 
             <button
-              onClick={toggleWalletModal}
+              onClick={isConnected ? toggleWalletModal : handleSignIn}
               className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-sm transition shadow-sm border ${
                 isConnected
                   ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
@@ -71,6 +76,7 @@ export default function Layout() {
           <div className="text-xs">© {new Date().getFullYear()} Project Care Coin. All rights reserved.</div>
         </div>
       </footer>
+
       <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
     </div>
   )
