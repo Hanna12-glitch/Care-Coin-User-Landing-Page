@@ -54,6 +54,7 @@ function buildSupportedWallets(): SupportedWallet[] {
               twitch:             { name: 'twitch',             showOnModal: false },
               weibo:              { name: 'weibo',              showOnModal: false },
               wechat:             { name: 'wechat',             showOnModal: false },
+              farcaster: { name: 'farcaster', showOnModal: false },
               sms_passwordless:   { name: 'sms_passwordless',   showOnModal: false },
               email_passwordless: { name: 'email_passwordless', showOnModal: true  },
             },

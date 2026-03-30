@@ -6,16 +6,15 @@ import ThemeToggle from './components/ThemeToggle'
 import { ellipseAddress } from './utils/ellipseAddress'
 
 export default function Layout() {
-  const [openWalletModal, setOpenWalletModal] = useState(false)
   const { activeAddress } = useWallet()
-
-  const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
-
   const isConnected = Boolean(activeAddress)
-
   const displayAddress = isConnected && activeAddress ? ellipseAddress(activeAddress, 4) : 'Sign in'
 
+  const [openWalletModal, setOpenWalletModal] = useState(false)
+  const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
   return (
+
+
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       {/* Navbar */}
       <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm">
@@ -24,7 +23,6 @@ export default function Layout() {
             Project Care Coin
           </NavLink>
 
-          {/* Desktop Navigation — only Home */}
           <div className="hidden sm:flex items-center gap-8">
             <NavLink
               to="/"
@@ -39,7 +37,6 @@ export default function Layout() {
           <div className="flex items-center gap-4">
             <ThemeToggle />
 
-            {/* Sign In / Account Button */}
             <button
               onClick={toggleWalletModal}
               className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-sm transition shadow-sm border ${
@@ -59,7 +56,6 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* Footer */}
       <footer className="bg-[#141938] text-slate-400 py-12 px-6 border-t border-slate-800">
         <div className="max-w-7xl mx-auto grid gap-8 md:grid-cols-3">
           <div>
@@ -75,8 +71,6 @@ export default function Layout() {
           <div className="text-xs">© {new Date().getFullYear()} Project Care Coin. All rights reserved.</div>
         </div>
       </footer>
-
-      {/* Wallet Modal */}
       <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
     </div>
   )
