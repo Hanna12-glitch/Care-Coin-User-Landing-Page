@@ -26,7 +26,7 @@ export default function Layout() {
 
           {/* Logo */}
           <NavLink to="/">
-            <img src="/Logo.svg" alt="Project Care Coin" className="h-10 w-auto" />
+            <img src="/Logo.svg" alt="Project Care Coin" className="h-20 w-auto" />
           </NavLink>
 
           {/* Right side */}
