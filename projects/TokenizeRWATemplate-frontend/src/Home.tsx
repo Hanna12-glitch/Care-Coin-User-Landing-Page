@@ -29,7 +29,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-[#FFD1FF] dark:bg-[#141938]">
+    <div className="bg-[#ffffff] dark:bg-[#141938]">
 
       {/* Hero Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-16 sm:pb-24">

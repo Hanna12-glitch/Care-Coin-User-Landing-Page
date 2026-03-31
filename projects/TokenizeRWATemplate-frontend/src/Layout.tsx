@@ -2,7 +2,6 @@ import { WalletId, useWallet } from '@txnlab/use-wallet-react'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import ConnectWallet from './components/ConnectWallet'
-import ThemeToggle from './components/ThemeToggle'
 import { ellipseAddress } from './utils/ellipseAddress'
 
 export default function Layout() {
@@ -22,32 +21,22 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       {/* Navbar */}
-      <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <NavLink to="/" className="text-2xl font-bold text-[#141938] dark:text-white hover:text-[#1333fa] transition">
-            Project Care Coin
+      <nav className="bg-[#FFD1FF] dark:bg-pink-950 sticky top-0 z-50">
+        <div className="w-full px-8 py-8 flex items-center justify-between">
+
+          {/* Logo */}
+          <NavLink to="/">
+            <img src="/Logo.svg" alt="Project Care Coin" className="h-10 w-auto" />
           </NavLink>
 
-          <div className="hidden sm:flex items-center gap-8">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `text-sm font-semibold transition ${isActive ? 'text-[#1333fa]' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`
-              }
-            >
-              Home
-            </NavLink>
-          </div>
-
+          {/* Right side */}
           <div className="flex items-center gap-4">
-            <ThemeToggle />
-
             <button
               onClick={isConnected ? toggleWalletModal : handleSignIn}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-sm transition shadow-sm border ${
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-sm transition ${
                 isConnected
-                  ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
-                  : 'bg-[#1333fa] border-[#1333fa] text-white hover:bg-[#fa1179]'
+                  ? 'bg-white/60 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
+                  : 'bg-[#1333fa] text-white hover:bg-[#fa1179]'
               }`}
             >
               {isConnected && <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />}

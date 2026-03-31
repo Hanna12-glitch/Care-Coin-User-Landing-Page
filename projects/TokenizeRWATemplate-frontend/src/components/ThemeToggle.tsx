@@ -1,57 +1,29 @@
 import { useEffect, useState } from 'react'
 
-const THEME_KEY = 'tokenize_theme'
-type Theme = 'light' | 'dark'
-
-/**
- * Get initial theme preference from localStorage or system preference
- */
-function getInitialTheme(): Theme {
-  const saved = localStorage.getItem(THEME_KEY)
-  if (saved === 'light' || saved === 'dark') return saved
-  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
-  return prefersDark ? 'dark' : 'light'
-}
-
-/**
- * ThemeToggle Component
- * Allows users to toggle between light and dark modes
- * Persists theme preference to localStorage and applies Tailwind's dark class
- */
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme())
-  const [mounted, setMounted] = useState(false)
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains('dark')
+  )
 
   useEffect(() => {
-    setMounted(true)
-    // Apply theme immediately on mount to prevent flash
-    const t = getInitialTheme()
-    if (t === 'dark') {
+    if (dark) {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
     }
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) return
-    // Apply Tailwind dark mode
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    localStorage.setItem(THEME_KEY, theme)
-  }, [theme, mounted])
+  }, [dark])
 
   return (
     <button
-      type="button"
-      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition"
-      onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-      title="Toggle light/dark mode"
+      onClick={() => setDark(!dark)}
+      className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition shadow-sm border ${
+        dark
+          ? 'bg-[#1a2744] border-[#2a3d6e] text-yellow-200'
+          : 'bg-sky-200 border-sky-300 text-orange-500'
+      }`}
+      aria-label="Toggle theme"
     >
-      {theme === 'dark' ? '🌙' : '☀️'}
+      {dark ? 'dark' : 'light'}
     </button>
   )
 }
