@@ -21,7 +21,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       {/* Navbar */}
-      <nav className="bg-[#FFD1FF] dark:bg-pink-950 sticky top-0 z-50">
+      <nav className="bg-[#fddeef] dark:bg-pink-950 sticky top-0 z-50">
         <div className="w-full px-8 py-8 flex items-center justify-between">
 
           {/* Logo */}

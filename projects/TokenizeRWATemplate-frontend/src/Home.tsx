@@ -1,13 +1,7 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 
-/**
- * Home Page
- * User-facing landing page for Project Care Coin
- * Social login flow — Web3Auth email passwordless
- */
 export default function Home() {
   const { activeAddress, wallets } = useWallet()
-
   const web3authWallet = wallets?.find(w => w.id === 'web3auth')
 
   return (
@@ -16,16 +10,13 @@ export default function Home() {
       {/* Hero Section */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-16 sm:pb-24">
         <div className="text-center">
-
           <div className="inline-block mb-6 px-4 py-1.5 bg-[#fa1179] text-white text-xs font-bold rounded-full uppercase tracking-widest shadow-sm">
             Proof-of-Concept · Built on Algorand
           </div>
-
           <h1 className="mt-6 text-5xl sm:text-7xl font-extrabold text-[#141938] dark:text-white leading-tight tracking-tight">
             Your care work<br />
             <span className="text-[#1333fa]">gets rewarded.</span>
           </h1>
-
           <p className="mt-6 text-lg sm:text-xl text-[#141938]/70 dark:text-slate-300 max-w-xl mx-auto leading-relaxed font-medium">
             Childcare. Eldercare. Household work. Project Care Coin turns your invisible labour into a verified digital asset — recognised, recorded, and real.
           </p>
@@ -55,140 +46,134 @@ export default function Home() {
               </div>
             )}
           </div>
-
         </div>
       </div>
 
       {/* Stats Strip */}
       <div className="bg-[#1333fa] dark:bg-[#1333fa]/80">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           <div>
-            <p className="text-4xl font-extrabold text-[#fb9b0c]">€374bn</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Annual value of unpaid care work in Germany alone</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">117bn hours</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Germany alone</p>
           </div>
           <div>
-            <p className="text-4xl font-extrabold text-[#fb9b0c]">64%</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">64%</p>
             <p className="mt-1 text-sm text-white/80 font-medium">Of all unpaid carers in the EU are women</p>
           </div>
           <div>
-            <p className="text-4xl font-extrabold text-[#FFD1FF]">0</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
             <p className="mt-1 text-sm text-white/80 font-medium">Verifiable records exist today — Care Coin changes that</p>
           </div>
         </div>
       </div>
 
-      {/* How It Works */}
-      <div className="bg-white dark:bg-[#141938]/60">
+      {/* How It Works — 5 Steps: 2 + 2 + 1 */}
+      <div className="bg-[#141938]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
 
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#141938] dark:text-white">How it works</h2>
-            <p className="mt-3 text-[#141938]/60 dark:text-slate-400 font-medium">
-              Three simple steps. No crypto knowledge needed.
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white">How it works</h2>
+          </div>
+
+          {/* Row 1 — Steps 1 & 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+
+            {/* Step 1 — Sign In */}
+            <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+              <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+                1
+              </div>
+              <h3 className="text-lg font-extrabold text-white mb-2">Sign In</h3>
+              <p className="text-sm text-white/60 leading-relaxed">
+                Enter your email — you will receive a one-time log-in code. No password required.
+              </p>
+            </div>
+
+          
+
+          </div>
+
+          {/* Row 2 — Steps 3 & 4 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+
+            {/* Step 3 — Log Your Care Work */}
+            <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+              <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+                2
+              </div>
+              <h3 className="text-lg font-extrabold text-white mb-2">Log Your Care Work</h3>
+              <p className="text-sm text-white/60 leading-relaxed">
+                Put in the amount of care and what type. Take your time and tell us what was most exhausting for you.
+              </p>
+            </div>
+
+            {/* Step 4 — Receive Care Coins */}
+            <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+              <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+                3
+              </div>
+              <h3 className="text-lg font-extrabold text-white mb-2">Receive Care Coins</h3>
+              <p className="text-sm text-white/60 leading-relaxed">
+                Care Coin will send your care coins to your account. One hour = one care coin.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Row 3 — Step 5 full width */}
+          <div className="rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition group">
+            <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+              4
+            </div>
+            <h3 className="text-lg font-extrabold text-white mb-2">Redeem Your Reward</h3>
+            <p className="text-sm text-white/60 leading-relaxed max-w-xl">
+              Choose what you would like to exchange your care coins for. This helps us find the right partners for Project Care Coin.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-
-            {/* Step 1 */}
-            <div className="group rounded-3xl border-2 border-[#FFD1FF] dark:border-[#1333fa]/30 bg-[#FFD1FF]/30 dark:bg-[#1333fa]/5 p-7 hover:border-[#fa1179] hover:shadow-xl hover:shadow-[#fa1179]/10 transition">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#fa1179] text-white font-extrabold text-lg shadow-md">1</div>
-                <div className="min-w-0">
-                  <h3 className="text-lg font-extrabold text-[#141938] dark:text-white">Sign In</h3>
-                  <p className="mt-1 text-sm text-[#141938]/60 dark:text-slate-300 leading-relaxed">
-                    Enter your email above — no app download, no crypto wallet needed.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5 flex items-center justify-between text-xs font-semibold text-[#141938]/40 dark:text-slate-500">
-                <span>Free sign-in</span>
-                <span className="group-hover:text-[#fa1179] transition">Instant ✦</span>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="group rounded-3xl border-2 border-[#FFD1FF] dark:border-[#1333fa]/30 bg-[#FFD1FF]/30 dark:bg-[#1333fa]/5 p-7 hover:border-[#1333fa] hover:shadow-xl hover:shadow-[#1333fa]/10 transition">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#1333fa] text-white font-extrabold text-lg shadow-md">2</div>
-                <div className="min-w-0">
-                  <h3 className="text-lg font-extrabold text-[#141938] dark:text-white">Receive Your Token</h3>
-                  <p className="mt-1 text-sm text-[#141938]/60 dark:text-slate-300 leading-relaxed">
-                    A CARE token is sent to your account — each one represents one hour of recognised care work.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5 flex items-center justify-between text-xs font-semibold text-[#141938]/40 dark:text-slate-500">
-                <span>Airdrop</span>
-                <span className="group-hover:text-[#1333fa] transition">Automatic ✦</span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="group rounded-3xl border-2 border-[#FFD1FF] dark:border-[#1333fa]/30 bg-[#FFD1FF]/30 dark:bg-[#1333fa]/5 p-7 hover:border-[#fb9b0c] hover:shadow-xl hover:shadow-[#fb9b0c]/10 transition">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#fb9b0c] text-white font-extrabold text-lg shadow-md">3</div>
-                <div className="min-w-0">
-                  <h3 className="text-lg font-extrabold text-[#141938] dark:text-white">See Your Impact</h3>
-                  <p className="mt-1 text-sm text-[#141938]/60 dark:text-slate-300 leading-relaxed">
-                    View your care token balance — a permanent, verified record of your contribution.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5 flex items-center justify-between text-xs font-semibold text-[#141938]/40 dark:text-slate-500">
-                <span>Your profile</span>
-                <span className="group-hover:text-[#fb9b0c] transition">Always yours ✦</span>
-              </div>
-            </div>
-
-          </div>
         </div>
       </div>
 
-      {/* Features Highlight */}
-      <div className="bg-[#FFD1FF] dark:bg-[#141938]">
+      {/* Member Card Section */}
+      <div className="bg-[#FFFFFF] dark:bg-[#1a1035]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="grid md:grid-cols-2 gap-12 items-center">
 
+            {/* Text left */}
             <div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#141938] dark:text-white mb-3 leading-tight">
-                Designed for trust.<br />
-                <span className="text-[#1333fa]">Built for you.</span>
-              </h2>
-              <p className="text-[#141938]/60 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
-                Every Care Coin token is issued on Algorand — a secure, transparent blockchain. Your contribution is permanently recorded and always verifiable.
+              <p className="text-xs font-bold uppercase tracking-widest text-[#fa1179] mb-4">
+                ✦ Exclusive
               </p>
-              <ul className="space-y-5">
-                {[
-                  'No crypto knowledge needed — we handle everything for you',
-                  'Permanently recorded — your care hours live on the blockchain forever',
-                  '100% free to join — this pilot costs you nothing',
-                  'Your token, your data — always in your control',
-                ].map((item, i) => (
-                  <li key={i} className="flex gap-4 items-start">
-                    <span className="mt-0.5 shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                    <span className="text-[#141938] dark:text-gray-200 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: item.replace(/^([^—]+)/, '<strong>$1</strong>') }} />
-                  </li>
-                ))}
-              </ul>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#141938] dark:text-white mb-6 leading-tight">
+                Your Member Card
+              </h2>
+              <p className="text-[#141938]/70 dark:text-slate-300 text-base leading-relaxed">
+                Project Care-Coin sends you a digital member ID. It is bound to your wallet, cannot be transferred or copied. It will always prove you are an early supporter and eligible for benefits in the future.
+              </p>
+              <div className="mt-8 flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
+                  <span className="text-[#141938] dark:text-gray-200 text-sm font-medium">Bound to your wallet — non-transferable</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
+                  <span className="text-[#141938] dark:text-gray-200 text-sm font-medium">Permanent proof of early support</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
+                  <span className="text-[#141938] dark:text-gray-200 text-sm font-medium">Unlocks future benefits & rewards</span>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-[#1333fa] rounded-3xl p-8 shadow-2xl shadow-[#1333fa]/30">
-              <p className="text-xs text-[#FFD1FF] mb-6 font-bold uppercase tracking-widest">✦ Sample Care Token</p>
-              <div className="space-y-4 text-sm">
-                {[
-                  { label: 'Name', value: 'Family Care Credit', color: 'text-white' },
-                  { label: 'Symbol', value: 'CARE', color: 'text-[#fb9b0c]' },
-                  { label: 'Total Supply', value: '52,000', color: 'text-white' },
-                  { label: 'Unit', value: '1 token = 1 hour', color: 'text-[#FFD1FF]' },
-                  { label: 'Issued by', value: 'Project Care Coin', color: 'text-white' },
-                ].map((row, i, arr) => (
-                  <div key={i} className={`flex justify-between ${i < arr.length - 1 ? 'border-b border-white/10 pb-3' : ''}`}>
-                    <span className="text-white/60 font-medium">{row.label}</span>
-                    <span className={`font-bold ${row.color}`}>{row.value}</span>
-                  </div>
-                ))}
-              </div>
+            {/* Image right */}
+            <div className="flex justify-center">
+              <img
+                src="/Care-Coin-NFT.jpg"
+                alt="Project Care-Coin Member Card NFT"
+                className="w-full max-w-xs shadow-2xl shadow-[#1333fa]/20"
+                loading="lazy"
+              />
             </div>
 
           </div>
@@ -203,9 +188,9 @@ export default function Home() {
           </div>
           <h2 className="text-4xl sm:text-5xl font-extrabold mb-4 leading-tight">
             Ready to claim<br />
-            <span className="text-[#fb9b0c]">your Care Token?</span>
+            <span className="text-[#fb9b0c]">your Care Coin?</span>
           </h2>
-          <p className="text-lg text-[#FFD1FF]/80 mb-2 max-w-xl mx-auto font-medium leading-relaxed">
+          <p className="text-lg text-[#fddeef]/80 mb-2 max-w-xl mx-auto font-medium leading-relaxed">
             Sign in with your email to get started. It takes 30 seconds.
           </p>
           <p className="text-sm text-white/40 mb-10 font-medium">
@@ -223,7 +208,7 @@ export default function Home() {
               disabled={!web3authWallet}
               className="px-12 py-4 rounded-2xl font-extrabold text-lg bg-[#1333fa] text-white hover:bg-[#fa1179] hover:scale-105 transition disabled:opacity-40 shadow-xl"
             >
-              ✉️ Sign in with Email
+              Sign in with Email
             </button>
           )}
         </div>
