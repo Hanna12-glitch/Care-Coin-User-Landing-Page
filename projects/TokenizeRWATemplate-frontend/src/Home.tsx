@@ -1,5 +1,4 @@
 import { useWallet } from '@txnlab/use-wallet-react'
-import { useState } from 'react'
 
 /**
  * Home Page
@@ -8,25 +7,8 @@ import { useState } from 'react'
  */
 export default function Home() {
   const { activeAddress, wallets } = useWallet()
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const web3authWallet = wallets?.find(w => w.id === 'web3auth')
-
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || !web3authWallet) return
-    setLoading(true)
-    setError('')
-    try {
-      await web3authWallet.connect({ loginProvider: 'email_passwordless', login_hint: email })
-    } catch {
-      setError('Login failed. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div className="bg-[#ffffff] dark:bg-[#141938]">
@@ -57,58 +39,16 @@ export default function Home() {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-5">
-
-                {/* Email Login Form */}
-                <form onSubmit={handleEmailLogin} className="w-full max-w-sm flex flex-col gap-3">
-                  <label className="text-sm font-bold text-[#141938] dark:text-white text-center">
-                    Your email address
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="anna@gmail.com"
-                    required
-                    className="w-full px-5 py-3.5 rounded-2xl border-2 border-[#141938]/20 dark:border-white/20 bg-white dark:bg-[#141938] text-[#141938] dark:text-white placeholder:text-[#141938]/30 focus:outline-none focus:border-[#1333fa] transition text-base"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading || !email}
-                    className="w-full px-5 py-3.5 rounded-2xl font-bold text-base bg-[#1333fa] text-white hover:bg-[#fa1179] hover:scale-105 transition disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Sending link...
-                      </>
-                    ) : (
-                      '✉️ Sign in with Email'
-                    )}
-                  </button>
-                  {error && (
-                    <p className="text-xs text-[#fa1179] text-center font-medium">{error}</p>
-                  )}
-                  <p className="text-xs text-[#141938]/40 dark:text-slate-500 text-center font-medium">
-                    We'll send you a one-time login link. No password needed.
-                  </p>
-                </form>
-
-                {/* Divider */}
-                <div className="flex items-center gap-4 w-full max-w-sm">
-                  <div className="flex-1 h-px bg-[#141938]/20 dark:bg-white/20" />
-                  <span className="text-xs text-[#141938]/40 dark:text-slate-500 font-medium">or</span>
-                  <div className="flex-1 h-px bg-[#141938]/20 dark:bg-white/20" />
-                </div>
-
-                <a
-                  className="w-full max-w-sm text-center px-10 py-4 bg-white dark:bg-[#141938] border-2 border-[#141938] dark:border-[#FFD1FF]/30 text-[#141938] dark:text-[#FFD1FF] rounded-2xl font-bold text-lg hover:bg-[#1333fa] hover:text-white hover:border-[#1333fa] dark:hover:bg-[#1333fa]/20 transition"
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://www.project-care-coin.org"
+                <button
+                  onClick={() => web3authWallet?.connect()}
+                  disabled={!web3authWallet}
+                  className="px-10 py-4 rounded-2xl font-bold text-lg bg-[#1333fa] text-white hover:bg-[#fa1179] hover:scale-105 transition disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Learn more →
-                </a>
-
+                  Sign in with Email
+                </button>
+                <p className="text-xs text-[#141938]/40 dark:text-slate-500 text-center font-medium">
+                  We'll send you a one-time login link. No password needed.
+                </p>
                 <p className="text-sm text-[#141938]/50 dark:text-slate-400 font-medium">
                   Free to join. No crypto knowledge needed.
                 </p>
@@ -153,9 +93,7 @@ export default function Home() {
             {/* Step 1 */}
             <div className="group rounded-3xl border-2 border-[#FFD1FF] dark:border-[#1333fa]/30 bg-[#FFD1FF]/30 dark:bg-[#1333fa]/5 p-7 hover:border-[#fa1179] hover:shadow-xl hover:shadow-[#fa1179]/10 transition">
               <div className="flex items-start gap-4">
-                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#fa1179] text-white font-extrabold text-lg shadow-md">
-                  1
-                </div>
+                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#fa1179] text-white font-extrabold text-lg shadow-md">1</div>
                 <div className="min-w-0">
                   <h3 className="text-lg font-extrabold text-[#141938] dark:text-white">Sign In</h3>
                   <p className="mt-1 text-sm text-[#141938]/60 dark:text-slate-300 leading-relaxed">
@@ -172,9 +110,7 @@ export default function Home() {
             {/* Step 2 */}
             <div className="group rounded-3xl border-2 border-[#FFD1FF] dark:border-[#1333fa]/30 bg-[#FFD1FF]/30 dark:bg-[#1333fa]/5 p-7 hover:border-[#1333fa] hover:shadow-xl hover:shadow-[#1333fa]/10 transition">
               <div className="flex items-start gap-4">
-                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#1333fa] text-white font-extrabold text-lg shadow-md">
-                  2
-                </div>
+                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#1333fa] text-white font-extrabold text-lg shadow-md">2</div>
                 <div className="min-w-0">
                   <h3 className="text-lg font-extrabold text-[#141938] dark:text-white">Receive Your Token</h3>
                   <p className="mt-1 text-sm text-[#141938]/60 dark:text-slate-300 leading-relaxed">
@@ -191,9 +127,7 @@ export default function Home() {
             {/* Step 3 */}
             <div className="group rounded-3xl border-2 border-[#FFD1FF] dark:border-[#1333fa]/30 bg-[#FFD1FF]/30 dark:bg-[#1333fa]/5 p-7 hover:border-[#fb9b0c] hover:shadow-xl hover:shadow-[#fb9b0c]/10 transition">
               <div className="flex items-start gap-4">
-                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#fb9b0c] text-white font-extrabold text-lg shadow-md">
-                  3
-                </div>
+                <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#fb9b0c] text-white font-extrabold text-lg shadow-md">3</div>
                 <div className="min-w-0">
                   <h3 className="text-lg font-extrabold text-[#141938] dark:text-white">See Your Impact</h3>
                   <p className="mt-1 text-sm text-[#141938]/60 dark:text-slate-300 leading-relaxed">
@@ -225,56 +159,35 @@ export default function Home() {
                 Every Care Coin token is issued on Algorand — a secure, transparent blockchain. Your contribution is permanently recorded and always verifiable.
               </p>
               <ul className="space-y-5">
-                <li className="flex gap-4 items-start">
-                  <span className="mt-0.5 shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                  <span className="text-[#141938] dark:text-gray-200 text-sm leading-relaxed">
-                    <strong className="font-bold">No crypto knowledge needed</strong> — we handle everything for you
-                  </span>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <span className="mt-0.5 shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                  <span className="text-[#141938] dark:text-gray-200 text-sm leading-relaxed">
-                    <strong className="font-bold">Permanently recorded</strong> — your care hours live on the blockchain forever
-                  </span>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <span className="mt-0.5 shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                  <span className="text-[#141938] dark:text-gray-200 text-sm leading-relaxed">
-                    <strong className="font-bold">100% free to join</strong> — this pilot costs you nothing
-                  </span>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <span className="mt-0.5 shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                  <span className="text-[#141938] dark:text-gray-200 text-sm leading-relaxed">
-                    <strong className="font-bold">Your token, your data</strong> — always in your control
-                  </span>
-                </li>
+                {[
+                  'No crypto knowledge needed — we handle everything for you',
+                  'Permanently recorded — your care hours live on the blockchain forever',
+                  '100% free to join — this pilot costs you nothing',
+                  'Your token, your data — always in your control',
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-4 items-start">
+                    <span className="mt-0.5 shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
+                    <span className="text-[#141938] dark:text-gray-200 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: item.replace(/^([^—]+)/, '<strong>$1</strong>') }} />
+                  </li>
+                ))}
               </ul>
             </div>
 
             <div className="bg-[#1333fa] rounded-3xl p-8 shadow-2xl shadow-[#1333fa]/30">
               <p className="text-xs text-[#FFD1FF] mb-6 font-bold uppercase tracking-widest">✦ Sample Care Token</p>
               <div className="space-y-4 text-sm">
-                <div className="flex justify-between border-b border-white/10 pb-3">
-                  <span className="text-white/60 font-medium">Name</span>
-                  <span className="font-bold text-white">Family Care Credit</span>
-                </div>
-                <div className="flex justify-between border-b border-white/10 pb-3">
-                  <span className="text-white/60 font-medium">Symbol</span>
-                  <span className="font-bold text-[#fb9b0c]">CARE</span>
-                </div>
-                <div className="flex justify-between border-b border-white/10 pb-3">
-                  <span className="text-white/60 font-medium">Total Supply</span>
-                  <span className="font-bold text-white">52,000</span>
-                </div>
-                <div className="flex justify-between border-b border-white/10 pb-3">
-                  <span className="text-white/60 font-medium">Unit</span>
-                  <span className="font-bold text-[#FFD1FF]">1 token = 1 hour</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/60 font-medium">Issued by</span>
-                  <span className="font-bold text-white">Project Care Coin</span>
-                </div>
+                {[
+                  { label: 'Name', value: 'Family Care Credit', color: 'text-white' },
+                  { label: 'Symbol', value: 'CARE', color: 'text-[#fb9b0c]' },
+                  { label: 'Total Supply', value: '52,000', color: 'text-white' },
+                  { label: 'Unit', value: '1 token = 1 hour', color: 'text-[#FFD1FF]' },
+                  { label: 'Issued by', value: 'Project Care Coin', color: 'text-white' },
+                ].map((row, i, arr) => (
+                  <div key={i} className={`flex justify-between ${i < arr.length - 1 ? 'border-b border-white/10 pb-3' : ''}`}>
+                    <span className="text-white/60 font-medium">{row.label}</span>
+                    <span className={`font-bold ${row.color}`}>{row.value}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -293,7 +206,7 @@ export default function Home() {
             <span className="text-[#fb9b0c]">your Care Token?</span>
           </h2>
           <p className="text-lg text-[#FFD1FF]/80 mb-2 max-w-xl mx-auto font-medium leading-relaxed">
-            Enter your email above to get started. It takes 30 seconds.
+            Sign in with your email to get started. It takes 30 seconds.
           </p>
           <p className="text-sm text-white/40 mb-10 font-medium">
             No crypto wallet needed. No hidden fees. Just your care, recognised. 💛
@@ -305,9 +218,13 @@ export default function Home() {
               You're signed in — token on its way! 🎉
             </div>
           ) : (
-            <div className="inline-block px-12 py-4 rounded-2xl font-extrabold text-lg bg-white/10 text-white/60 border-2 border-white/20">
-              👆 Enter your email at the top of the page
-            </div>
+            <button
+              onClick={() => web3authWallet?.connect()}
+              disabled={!web3authWallet}
+              className="px-12 py-4 rounded-2xl font-extrabold text-lg bg-[#1333fa] text-white hover:bg-[#fa1179] hover:scale-105 transition disabled:opacity-40 shadow-xl"
+            >
+              ✉️ Sign in with Email
+            </button>
           )}
         </div>
       </div>
