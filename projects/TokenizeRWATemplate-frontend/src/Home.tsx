@@ -103,7 +103,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-extrabold text-white mb-2">Log Your Care Work</h3>
               <p className="text-sm text-white/60 leading-relaxed">
-                Put in the amount of care and what type. Take your time and tell us what was most exhausting for you.
+                Put in the amount of care work and what type.
               </p>
             </div>
 
