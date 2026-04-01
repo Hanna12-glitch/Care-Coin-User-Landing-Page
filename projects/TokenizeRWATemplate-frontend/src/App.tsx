@@ -4,6 +4,9 @@ import { SnackbarProvider } from 'notistack'
 import { useMemo } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './Home'
+import Dashboard from './Dashboard'
+import LogCare from './LogCare'
+import Redeem from './Redeem'
 import Layout from './Layout'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
@@ -33,10 +36,7 @@ function buildSupportedWallets(): SupportedWallet[] {
       options: {
         clientId: web3AuthClientId,
         web3AuthNetwork: 'sapphire_devnet',
-        uiConfig: {
-          appName: 'Project Care Coin',
-          mode: 'auto',
-        },
+        uiConfig: { appName: 'Project Care Coin', mode: 'auto' },
         modalConfig: {
           auth: {
             label: 'auth',
@@ -54,7 +54,7 @@ function buildSupportedWallets(): SupportedWallet[] {
               twitch:             { name: 'twitch',             showOnModal: false },
               weibo:              { name: 'weibo',              showOnModal: false },
               wechat:             { name: 'wechat',             showOnModal: false },
-              farcaster: { name: 'farcaster', showOnModal: false },
+              farcaster:          { name: 'farcaster',          showOnModal: false },
               sms_passwordless:   { name: 'sms_passwordless',   showOnModal: false },
               email_passwordless: { name: 'email_passwordless', showOnModal: true  },
             },
@@ -69,7 +69,6 @@ function buildSupportedWallets(): SupportedWallet[] {
 
 export default function App() {
   const algodConfig = getAlgodConfigFromViteEnvironment()
-
   const supportedWallets = useMemo(() => buildSupportedWallets(), [])
   const walletManager = useMemo(() => {
     return new WalletManager({
@@ -84,9 +83,7 @@ export default function App() {
           },
         },
       },
-      options: {
-        resetNetwork: true,
-      },
+      options: { resetNetwork: true },
     })
   }, [algodConfig.network, algodConfig.server, algodConfig.port, algodConfig.token, supportedWallets])
 
@@ -98,6 +95,9 @@ export default function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/log" element={<LogCare />} />
+              <Route path="/redeem" element={<Redeem />} />
             </Route>
           </Routes>
         </BrowserRouter>

@@ -1,8 +1,15 @@
 import { useWallet } from '@txnlab/use-wallet-react'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function Home() {
   const { activeAddress, wallets } = useWallet()
   const web3authWallet = wallets?.find(w => w.id === 'web3auth')
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (activeAddress) navigate('/dashboard')
+  }, [activeAddress, navigate])
 
   return (
     <div className="bg-[#ffffff] dark:bg-[#141938]">
@@ -58,16 +65,16 @@ export default function Home() {
           </div>
           <div>
             <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Recogntion of this work in the economy — Care Coin changes that</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">Recognition of this work in the economy — Care Coin changes that</p>
           </div>
           <div>
             <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Recogntion of this work in the economy — Care Coin changes that</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">Recognition of this work in the economy — Care Coin changes that</p>
           </div>
         </div>
       </div>
 
-      {/* How It Works — 5 Steps: 2 + 2 + 1 */}
+      {/* How It Works — 4 Steps: 1 + 2 + 1 */}
       <div className="bg-[#141938]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
 
@@ -75,28 +82,21 @@ export default function Home() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white">How it works</h2>
           </div>
 
-          {/* Row 1 — Steps 1 & 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-
-            {/* Step 1 — Sign In */}
-            <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
-              <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
-                1
-              </div>
-              <h3 className="text-lg font-extrabold text-white mb-2">Sign In</h3>
-              <p className="text-sm text-white/60 leading-relaxed">
-                Enter your email — you will receive a one-time log-in code. No password required.
-              </p>
+          {/* Row 1 — Step 1 full width */}
+          <div className="mb-5 rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition group">
+            <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+              1
             </div>
-
-          
-
+            <h3 className="text-lg font-extrabold text-white mb-2">Sign In</h3>
+            <p className="text-sm text-white/60 leading-relaxed max-w-xl">
+              Enter your email — you will receive a one-time log-in code. No password required.
+            </p>
           </div>
 
-          {/* Row 2 — Steps 3 & 4 */}
+          {/* Row 2 — Steps 2 & 3 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
 
-            {/* Step 3 — Log Your Care Work */}
+            {/* Step 2 — Log Your Care Work */}
             <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
               <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
                 2
@@ -107,7 +107,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Step 4 — Receive Care Coins */}
+            {/* Step 3 — Receive Care Coins */}
             <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
               <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
                 3
@@ -120,7 +120,7 @@ export default function Home() {
 
           </div>
 
-          {/* Row 3 — Step 5 full width */}
+          {/* Row 3 — Step 4 full width */}
           <div className="rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition group">
             <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
               4
