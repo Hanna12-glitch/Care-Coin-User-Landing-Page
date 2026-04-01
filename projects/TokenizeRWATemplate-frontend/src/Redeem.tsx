@@ -5,20 +5,20 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 const REWARD_CATEGORIES = [
-  { id: 'wellness',   label: 'Wellness Voucher',    emoji: '💆', desc: 'Massage, spa or yoga' },
-  { id: 'financial',  label: 'Financial Coaching',  emoji: '💰', desc: '1:1 with an advisor' },
-  { id: 'shopping',   label: 'Shopping Voucher',    emoji: '🛍️', desc: 'Groceries or household' },
-  { id: 'childcare',  label: 'Childcare Support',   emoji: '👶', desc: 'Temporary childcare' },
-  { id: 'education',  label: 'Education',           emoji: '📚', desc: 'Course or workshop' },
-  { id: 'culture',    label: 'Culture & Leisure',   emoji: '🎭', desc: 'Cinema, theatre, museum' },
-  { id: 'health',     label: 'Health Check-Up',     emoji: '🏥', desc: 'Medical or preventive care' },
-  { id: 'other',      label: 'My own idea',         emoji: '✨', desc: 'Tell us what you want!' },
+  { id: 'wellness',  label: 'Wellness Voucher',   emoji: '💆', desc: 'Massage, spa or yoga' },
+  { id: 'financial', label: 'Financial Coaching', emoji: '💰', desc: '1:1 with an advisor' },
+  { id: 'shopping',  label: 'Shopping Voucher',   emoji: '🛍️', desc: 'Groceries or household' },
+  { id: 'childcare', label: 'Childcare Support',  emoji: '👶', desc: 'Temporary childcare' },
+  { id: 'education', label: 'Education',          emoji: '📚', desc: 'Course or workshop' },
+  { id: 'culture',   label: 'Culture & Leisure',  emoji: '🎭', desc: 'Cinema, theatre, museum' },
+  { id: 'health',    label: 'Health Check-Up',    emoji: '🏥', desc: 'Medical or preventive care' },
+  { id: 'other',     label: 'My own idea',        emoji: '✨', desc: 'Tell us what you want!' },
 ]
 
 type Status = 'idle' | 'signing' | 'submitting' | 'success' | 'error'
 
 export default function Redeem() {
-  const { activeAddress, activeWallet } = useWallet()
+  const { activeAddress, transactionSigner } = useWallet()
   const navigate = useNavigate()
 
   const [selected, setSelected] = useState<string | null>(null)
@@ -38,7 +38,7 @@ export default function Redeem() {
 
   const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selected || !activeWallet) return
+    if (!selected) return
 
     setStatus('signing')
     setErrorMsg('')
@@ -59,7 +59,6 @@ export default function Redeem() {
       let txn: algosdk.Transaction
 
       if (isRealMode) {
-        // Real: send 1 CARE token back to project wallet
         txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
           sender: activeAddress,
           receiver: projectWallet,
@@ -69,7 +68,6 @@ export default function Redeem() {
           suggestedParams,
         })
       } else {
-        // Simulate: 0-ALGO self-transaction with reward note
         txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
           sender: activeAddress,
           receiver: activeAddress,
@@ -79,13 +77,13 @@ export default function Redeem() {
         })
       }
 
-      const signedTxns = await activeWallet.signTransactions([txn])
+      const atc = new algosdk.AtomicTransactionComposer()
+      atc.addTransaction({ txn, signer: transactionSigner })
 
       setStatus('submitting')
-      const result = await algod.sendRawTransaction(signedTxns[0]!).do()
-      await algosdk.waitForConfirmation(algod, result.txid, 4)
+      const result = await atc.execute(algod, 4)
 
-      setTxId(result.txid)
+      setTxId(result.txIDs[0])
       setStatus('success')
     } catch (e: unknown) {
       console.error('[Redeem] Error:', e)
@@ -94,7 +92,6 @@ export default function Redeem() {
     }
   }
 
-  // Success screen
   if (status === 'success') {
     const rewardLabel = REWARD_CATEGORIES.find(r => r.id === selected)?.label ?? selected
     return (
@@ -147,7 +144,6 @@ export default function Redeem() {
 
         <form onSubmit={handleRedeem} className="space-y-8">
 
-          {/* Reward Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {REWARD_CATEGORIES.map(reward => (
               <button
@@ -167,7 +163,6 @@ export default function Redeem() {
             ))}
           </div>
 
-          {/* Custom idea */}
           {selected === 'other' && (
             <div>
               <label className="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wider">
@@ -184,7 +179,6 @@ export default function Redeem() {
             </div>
           )}
 
-          {/* Simulation note */}
           {!isRealMode && (
             <div className="rounded-2xl border border-[#fb9b0c]/20 bg-[#fb9b0c]/5 p-4 text-xs text-[#fb9b0c]">
               ⚙️ Simulation mode — your preference is recorded as a blockchain note.
@@ -192,14 +186,12 @@ export default function Redeem() {
             </div>
           )}
 
-          {/* Error */}
           {status === 'error' && (
             <div className="rounded-2xl border border-[#fa1179]/30 bg-[#fa1179]/10 p-4 text-sm text-[#fa1179]">
               {errorMsg}
             </div>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={
