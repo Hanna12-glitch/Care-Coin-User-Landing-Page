@@ -54,15 +54,15 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           <div>
             <p className="text-4xl font-extrabold text-[#fba30c]">117bn hours</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Germany alone</p>
-          </div>
-          <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">64%</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Of all unpaid carers in the EU are women</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Germany alone on top of paid jobs</p>
           </div>
           <div>
             <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Verifiable records exist today — Care Coin changes that</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">Recogntion of this work in the economy — Care Coin changes that</p>
+          </div>
+          <div>
+            <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">Recogntion of this work in the economy — Care Coin changes that</p>
           </div>
         </div>
       </div>
