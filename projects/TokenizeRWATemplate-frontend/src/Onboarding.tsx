@@ -1,6 +1,6 @@
+import { useState, useEffect, useRef } from 'react'
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
-import { useEffect, useRef, useState } from 'react'
 import { useCareCoinOptIn } from './useCareCoinOptIn'
 
 const CARE_ASSET_ID = Number((import.meta as any).env.VITE_CARE_COIN_ASSET_ID)

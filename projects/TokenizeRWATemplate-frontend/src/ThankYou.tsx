@@ -6,51 +6,70 @@ export default function ThankYou() {
   const { activeAddress } = useWallet()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center px-4">
-      <div className="max-w-lg w-full bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center px-4 py-16">
+      <div className="max-w-lg w-full mx-auto space-y-6 text-center">
 
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
-            <span className="text-3xl">🌿</span>
+          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
+            <span className="text-4xl">💛</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-teal-800">Thank you</h1>
-          <p className="text-gray-600">Your Care Coins are on their way.</p>
-        </div>
-
-        <div className="bg-teal-50 rounded-2xl p-4 space-y-1 text-left">
-          <p className="text-sm text-teal-800 font-medium">What happens next?</p>
-          <ul className="text-sm text-teal-700 space-y-1 list-disc list-inside">
-            <li>We review your onboarding answers</li>
-            <li>We manually send you test ALGO and Care Coins</li>
-            <li>Once received, you can explore your rewards</li>
-          </ul>
+          <h1 className="text-3xl font-bold text-teal-800">Thank you!</h1>
+          <p className="text-gray-500 text-base leading-relaxed">
+            Your care work has been recorded. We will review your entry and
+            send Care Coins directly to your wallet within 24 hours.
+          </p>
         </div>
 
         {activeAddress && (
-          <p className="text-xs text-gray-400 font-mono break-all">
-            Receiving wallet: {activeAddress}
-          </p>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-left space-y-1">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Care Coins will be sent to
+            </p>
+            <p className="text-xs font-mono text-gray-700 break-all">{activeAddress}</p>
+          </div>
         )}
 
-        <p className="text-xs text-gray-400 italic">
-          This is a research pilot — all tokens are on Algorand Testnet and have no monetary value.
-        </p>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-left space-y-3">
+          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">
+            What happens next
+          </h2>
+          <ol className="space-y-2 text-sm text-gray-600">
+            <li className="flex items-start gap-3">
+              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                1
+              </span>
+              <span>We review your care work submission (usually within 24 hours).</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                2
+              </span>
+              <span>Care Coins land in your wallet — 1 hour of care = 1 Care Coin.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                3
+              </span>
+              <span>Choose how to use your coins — see the options in Redeem.</span>
+            </li>
+          </ol>
+        </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={() => navigate('/redeem')}
-            className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-medium py-3 rounded-xl transition-all"
-          >
-            Explore Rewards →
-          </button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-xl transition-all"
+            className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm transition-all"
           >
-            Go to Dashboard
+            View my Dashboard →
+          </button>
+          <button
+            onClick={() => navigate('/redeem')}
+            className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-medium text-sm transition-all"
+          >
+            See Redeem options
           </button>
         </div>
 
