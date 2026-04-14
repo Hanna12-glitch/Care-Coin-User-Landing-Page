@@ -3,7 +3,7 @@ import algosdk from 'algosdk'
 import { useEffect, useRef, useState } from 'react'
 import { useCareCoinOptIn } from './useCareCoinOptIn'
 
-const CARE_ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
+const CARE_ASSET_ID = Number((import.meta as any).env.VITE_CARE_COIN_ASSET_ID)
 const FORMS_APP_ID = '69de0aa001324e32c38f6893'
 const FORMS_APP_BASE_URL = 'https://6h6u8bjv.forms.app'
 const WALLET_FIELD_ID = '69de108c8ca500adbd32ae02'
@@ -13,6 +13,7 @@ export default function Onboarding() {
   const { status, refetch, algodClient } = useCareCoinOptIn(activeAddress)
   const [optInLoading, setOptInLoading] = useState(false)
   const [optInError, setOptInError] = useState<string | null>(null)
+  const formContainerRef = useRef<HTMLDivElement>(null)
   const formInitializedRef = useRef(false)
 
   const isOptedIn = status === 'opted-in'
@@ -29,9 +30,7 @@ export default function Onboarding() {
             width: '100%',
             height: '820px',
             opacity: 0,
-            answers: {
-              [WALLET_FIELD_ID]: activeAddress,
-            },
+            answers: { [WALLET_FIELD_ID]: activeAddress },
           },
           FORMS_APP_BASE_URL
         )
@@ -39,10 +38,7 @@ export default function Onboarding() {
       }
     }
 
-    const existing = document.querySelector(
-      'script[src="https://forms.app/cdn/embed.js"]'
-    )
-
+    const existing = document.querySelector('script[src="https://forms.app/cdn/embed.js"]')
     if (existing) {
       initFormsApp()
     } else {
@@ -55,34 +51,41 @@ export default function Onboarding() {
     }
   }, [isOptedIn, activeAddress])
 
+  useEffect(() => {
+    if (formContainerRef.current) {
+      formContainerRef.current.setAttribute('formsappId', FORMS_APP_ID)
+    }
+  }, [])
+
   const handleOptIn = async () => {
     if (!activeAddress) return
     setOptInLoading(true)
     setOptInError(null)
-
     try {
       const suggestedParams = await algodClient.getTransactionParams().do()
 
-      const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+      const txnParams: any = {
         from: activeAddress,
+        sender: activeAddress,
         to: activeAddress,
+        receiver: activeAddress,
         amount: 0,
         assetIndex: CARE_ASSET_ID,
         suggestedParams,
-      })
+      }
 
+      const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject(txnParams)
       const encodedTxn = algosdk.encodeUnsignedTransaction(txn)
       const signedTxns = await signTransactions([encodedTxn])
 
-      await algodClient.sendRawTransaction(signedTxns).do()
+      // signTransactions kann null-Werte enthalten (z.B. wenn User abbricht)
+      const validTxns = signedTxns.filter((t): t is Uint8Array => t !== null)
+      await algodClient.sendRawTransaction(validTxns).do()
       await algosdk.waitForConfirmation(algodClient, txn.txID().toString(), 4)
-
       await refetch()
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e)
-      setOptInError(
-        'Opt-in fehlgeschlagen. Bitte prüfe dein Wallet und versuche es erneut.'
-      )
+      setOptInError('Opt-in fehlgeschlagen. Bitte prüfe dein Wallet und versuche es erneut.')
     } finally {
       setOptInLoading(false)
     }
@@ -91,6 +94,7 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 py-10 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
+
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-teal-800">Welcome to Care Coin</h1>
           <p className="text-gray-500 text-sm">
@@ -103,9 +107,7 @@ export default function Onboarding() {
             <span className="w-3 h-3 rounded-full bg-green-400 inline-block" />
             <div>
               <p className="text-sm font-medium text-gray-700">Wallet connected</p>
-              <p className="text-xs text-gray-400 font-mono truncate max-w-xs">
-                {activeAddress}
-              </p>
+              <p className="text-xs text-gray-400 font-mono truncate max-w-xs">{activeAddress}</p>
             </div>
           </div>
         </div>
@@ -121,13 +123,9 @@ export default function Onboarding() {
                 ⓘ Your wallet needs a tiny ALGO reserve for this (≈ 0.1 ALGO).
               </p>
             </div>
-
             {optInError && (
-              <p className="text-sm text-red-500 bg-red-50 rounded-xl p-3">
-                {optInError}
-              </p>
+              <p className="text-sm text-red-500 bg-red-50 rounded-xl p-3">{optInError}</p>
             )}
-
             {status === 'loading' ? (
               <p className="text-sm text-gray-400 animate-pulse">Checking wallet…</p>
             ) : (
@@ -162,10 +160,10 @@ export default function Onboarding() {
                 Your answers help us understand how to value care better.
               </p>
             </div>
-
-            <div formsappId={FORMS_APP_ID}></div>
+            <div ref={formContainerRef} />
           </div>
         )}
+
       </div>
     </div>
   )

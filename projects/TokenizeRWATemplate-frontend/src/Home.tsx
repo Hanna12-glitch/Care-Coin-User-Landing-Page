@@ -8,7 +8,7 @@ export default function Home() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (activeAddress) navigate('/dashboard')
+    if (activeAddress) navigate('/onboarding')
   }, [activeAddress, navigate])
 
   return (

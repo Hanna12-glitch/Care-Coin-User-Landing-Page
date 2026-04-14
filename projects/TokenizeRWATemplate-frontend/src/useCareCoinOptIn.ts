@@ -3,11 +3,11 @@ import { useCallback, useEffect, useState } from 'react'
 
 const algodClient = new algosdk.Algodv2(
   '',
-  import.meta.env.VITE_ALGOD_SERVER ?? 'https://testnet-api.algonode.cloud',
-  import.meta.env.VITE_ALGOD_PORT ?? 443
+  (import.meta as any).env.VITE_ALGOD_SERVER ?? 'https://testnet-api.algonode.cloud',
+  (import.meta as any).env.VITE_ALGOD_PORT ?? 443
 )
 
-const CARE_ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
+const CARE_ASSET_ID = Number((import.meta as any).env.VITE_CARE_COIN_ASSET_ID)
 
 export type OptInStatus = 'loading' | 'opted-in' | 'not-opted-in' | 'error'
 
@@ -22,8 +22,14 @@ export function useCareCoinOptIn(activeAddress: string | null) {
     try {
       setStatus('loading')
       const info = await algodClient.accountInformation(activeAddress).do()
-      const assets: Array<{ 'asset-id': number }> = info['assets'] ?? []
-      const hasAsset = assets.some((a) => a['asset-id'] === CARE_ASSET_ID)
+      // algosdk v2: info['assets'], algosdk v3: info.assets — beide abgedeckt
+      const assets: Array<Record<string, unknown>> =
+        (info as any)['assets'] ?? (info as any).assets ?? []
+      const hasAsset = assets.some(
+        (a) =>
+          a['asset-id'] === CARE_ASSET_ID ||
+          (a as any).assetId === CARE_ASSET_ID
+      )
       setStatus(hasAsset ? 'opted-in' : 'not-opted-in')
     } catch (e) {
       console.error('OptIn check failed', e)
