@@ -3,11 +3,12 @@ import { Analytics } from '@vercel/analytics/react'
 import { SnackbarProvider } from 'notistack'
 import { useMemo } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Home from './Home'
 import Dashboard from './Dashboard'
-import LogCare from './LogCare'
-import Redeem from './Redeem'
+import Home from './Home'
 import Layout from './Layout'
+import Onboarding from './Onboarding'
+import Redeem from './Redeem'
+import ThankYou from './ThankYou'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 const web3AuthClientId = (import.meta.env.VITE_WEB3AUTH_CLIENT_ID ?? '').trim()
@@ -96,7 +97,8 @@ export default function App() {
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/log" element={<LogCare />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/thank-you" element={<ThankYou />} />
               <Route path="/redeem" element={<Redeem />} />
             </Route>
           </Routes>
