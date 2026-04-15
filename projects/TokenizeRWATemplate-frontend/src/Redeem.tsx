@@ -1,7 +1,7 @@
-import algosdk from 'algosdk'
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import { useWallet } from '@txnlab/use-wallet-react'
+import algosdk from 'algosdk'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 const REWARD_CATEGORIES = [
@@ -21,16 +21,18 @@ export default function Redeem() {
   const { activeAddress, transactionSigner } = useWallet()
   const navigate = useNavigate()
 
+  useEffect(() => {
+  if (!activeAddress) navigate('/')
+  }, [activeAddress, navigate])
+ 
+
   const [selected, setSelected] = useState<string | null>(null)
   const [customIdea, setCustomIdea] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [txId, setTxId] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
-  if (!activeAddress) {
-    navigate('/')
-    return null
-  }
+ if (!activeAddress) return null
 
   const assetId = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID ?? 0)
   const projectWallet = (import.meta.env.VITE_PROJECT_WALLET_ADDRESS ?? '').trim()

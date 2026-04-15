@@ -1,9 +1,24 @@
 import { useWallet } from '@txnlab/use-wallet-react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export default function ThankYou() {
   const navigate = useNavigate()
   const { activeAddress } = useWallet()
+
+  // Logout-Redirect
+  useEffect(() => {
+    if (!activeAddress) navigate('/')
+  }, [activeAddress, navigate])
+
+  // Flag setzen: dieser User hat das Formular ausgefüllt
+  useEffect(() => {
+    if (activeAddress) {
+      localStorage.setItem(`care-submitted-${activeAddress}`, 'true')
+    }
+  }, [activeAddress])
+
+  if (!activeAddress) return null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center px-4 py-16">
@@ -38,21 +53,15 @@ export default function ThankYou() {
           </h2>
           <ol className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">
-                1
-              </span>
+              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">1</span>
               <span>We review your care work submission (usually within 24 hours).</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">
-                2
-              </span>
+              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">2</span>
               <span>Care Coins land in your wallet — 1 hour of care = 1 Care Coin.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">
-                3
-              </span>
+              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">3</span>
               <span>Choose how to use your coins — see the options in Redeem.</span>
             </li>
           </ol>
