@@ -1,6 +1,6 @@
 import { useWallet } from '@txnlab/use-wallet-react'
-import { useEffect, useState } from 'react'
 import algosdk from 'algosdk'
+import { useEffect, useState } from 'react'
 
 const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
@@ -91,17 +91,7 @@ export default function Onboarding() {
         </div>
       )}
 
-      {(fundStatus === 'funded' || fundStatus === 'error') && !alreadyOptedIn && (
-        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>✅</span>
-            <strong>Welcome fund received</strong>
-          </div>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>
-            1 ALGO has been sent to your wallet to get you started.
-          </p>
-        </div>
-      )}
+      
 
       {/* Step 2: Opt-In */}
       {fundStatus === 'funded' && optInStatus !== 'done' && (
@@ -110,9 +100,7 @@ export default function Onboarding() {
           <p style={{ fontSize: '0.875rem', color: '#555', margin: '0.5rem 0 1rem' }}>
             One quick wallet step so we can send you Care Coins.
           </p>
-          <p style={{ fontSize: '0.75rem', color: '#888', marginBottom: '1rem' }}>
-            ⓘ Your wallet needs a tiny ALGO reserve for this.
-          </p>
+        
           {optInError && (
             <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{optInError}</p>
           )}
