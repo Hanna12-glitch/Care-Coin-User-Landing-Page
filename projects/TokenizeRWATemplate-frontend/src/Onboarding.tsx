@@ -1,12 +1,14 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
 
 export default function Onboarding() {
   const { activeAddress, transactionSigner } = useWallet()
+  const navigate = useNavigate()
 
   const [fundStatus, setFundStatus] = useState<'idle' | 'funding' | 'funded' | 'error'>('idle')
   const [optInStatus, setOptInStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
@@ -39,7 +41,22 @@ export default function Onboarding() {
     })
   }, [activeAddress, fundStatus])
 
-  // Step 3: Opt-in handler
+  // Step 3: Listen for form submission via postMessage
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (
+        typeof event.data === 'object' &&
+        event.data?.type === 'formsapp' &&
+        event.data?.action === 'submitted'
+      ) {
+        navigate('/thank-you')
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [navigate])
+
+  // Step 4: Opt-in handler
   const handleOptIn = async () => {
     if (!activeAddress || !transactionSigner) return
     setOptInStatus('loading')
@@ -91,16 +108,13 @@ export default function Onboarding() {
         </div>
       )}
 
-      
-
       {/* Step 2: Opt-In */}
-      {fundStatus === 'funded' && optInStatus !== 'done' && (
+      {fundStatus === 'funded' && optInStatus !== 'done' && !alreadyOptedIn && (
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '1.5rem', marginBottom: '1rem' }}>
           <strong>Enable Care Coin</strong>
           <p style={{ fontSize: '0.875rem', color: '#555', margin: '0.5rem 0 1rem' }}>
             One quick wallet step so we can send you Care Coins.
           </p>
-        
           {optInError && (
             <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{optInError}</p>
           )}
