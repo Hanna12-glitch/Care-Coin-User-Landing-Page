@@ -44,11 +44,10 @@ export default function Onboarding() {
   // Step 3: Listen for form submission via postMessage
   useEffect(() => {
   const handleMessage = (event: MessageEvent) => {
-    console.log('postMessage received:', event.origin, event.data)  // ← NEU
     if (
-      typeof event.data === 'object' &&
-      event.data?.type === 'formsapp' &&
-      event.data?.action === 'submitted'
+      event.origin.includes('forms.app') &&
+      typeof event.data === 'string' &&
+      event.data.startsWith('formsapp-formSubmitted')
     ) {
       navigate('/thank-you')
     }
