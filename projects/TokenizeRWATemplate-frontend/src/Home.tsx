@@ -74,65 +74,59 @@ export default function Home() {
         </div>
       </div>
 
-      {/* How It Works — 4 Steps: 1 + 2 + 1 */}
-      <div className="bg-[#141938]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
+      {/* Row 1 — Steps 1 & 2 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
 
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white">How it works</h2>
-          </div>
-
-          {/* Row 1 — Step 1 full width */}
-          <div className="mb-5 rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition group">
-            <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
-              1
-            </div>
-            <h3 className="text-lg font-extrabold text-white mb-2">Sign In</h3>
-            <p className="text-sm text-white/60 leading-relaxed max-w-xl">
-              Enter your email — you will receive a one-time log-in code. No password required.
-            </p>
-          </div>
-
-          {/* Row 2 — Steps 2 & 3 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-
-            {/* Step 2 — Log Your Care Work */}
-            <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
-              <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
-                2
-              </div>
-              <h3 className="text-lg font-extrabold text-white mb-2">Log Your Care Work</h3>
-              <p className="text-sm text-white/60 leading-relaxed">
-                We help you with a short questionnaire.
-              </p>
-            </div>
-
-            {/* Step 3 — Receive Care Coins */}
-            <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
-              <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
-                3
-              </div>
-              <h3 className="text-lg font-extrabold text-white mb-2">Receive Care Coins</h3>
-              <p className="text-sm text-white/60 leading-relaxed">
-                Care Coin will send your care coins to your account.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Row 3 — Step 4 full width */}
-          <div className="rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition group">
-            <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
-              4
-            </div>
-            <h3 className="text-lg font-extrabold text-white mb-2">Redeem Your Care-Coins</h3>
-            <p className="text-sm text-white/60 leading-relaxed max-w-xl">
-              Choose what you would like in exchange for your care coins for. This helps us find the right partners for Project Care Coin.
-            </p>
-          </div>
-         
-          </div>       
+      {/* Step 1 — Sign In */}
+      <div className="rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition group">
+        <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+        1
       </div>
+        <h3 className="text-lg font-extrabold text-white mb-2">Sign In</h3>
+        <p className="text-sm text-white/60 leading-relaxed">
+        Enter your email — you will receive a one-time log-in code. No password required.
+        </p>
+      </div>
+
+      {/* Step 2 — Log Your Care Work */}
+      <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+        <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+        2
+        </div>
+        <h3 className="text-lg font-extrabold text-white mb-2">Log Your Care Work</h3>
+        <p className="text-sm text-white/60 leading-relaxed">
+        We help you with a short questionnaire.
+        </p>
+      </div>
+
+    </div>
+
+      {/* Row 2 — Steps 3 & 4 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+    {/* Step 3 — Receive Care Coins */}
+    <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+    <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+      3
+    </div>
+    <h3 className="text-lg font-extrabold text-white mb-2">Receive Care Coins</h3>
+    <p className="text-sm text-white/60 leading-relaxed">
+      Care Coin will send your care coins to your account.
+    </p>
+    </div>
+
+    {/* Step 4 — Redeem Your Care Coins */}
+    <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+    <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
+      4
+    </div>
+    <h3 className="text-lg font-extrabold text-white mb-2">Redeem Your Care Coins</h3>
+    <p className="text-sm text-white/60 leading-relaxed">
+      Choose what you would like in exchange for your care coins. This helps us find the right partners for Project Care Coin.
+    </p>
+    </div>
+
+        </div>
 
       {/* CTA Section */}
       <div className="bg-[#141938] text-white">
