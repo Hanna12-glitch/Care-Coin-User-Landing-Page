@@ -101,10 +101,7 @@ export default function Onboarding() {
         This is a research pilot. Your care work matters — and we want to recognise it.
       </p>
 
-    {/* TEMP DEBUG */}
-    <p style={{ color: 'red', fontSize: '0.75rem' }}>
-      fundStatus: {fundStatus} | optInStatus: {optInStatus} | alreadyOptedIn: {String(alreadyOptedIn)}
-    </p>
+    
 
       {/* Step 1: Welcome Fund */}
       {fundStatus === 'funding' && (
@@ -142,12 +139,12 @@ export default function Onboarding() {
       {/* Step 3: Form */}
       {(optInStatus === 'done' || alreadyOptedIn) && (
         <div>
-          <div style={{ background: '#dbf5fb', border: '1px solid #1333fa', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ background: '#e5f8fc', border: '0px solid #1333fa', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>✅</span>
+            
               <strong>Care Coin enabled</strong>
             </div>
-            <p style={{ fontSize: '0.875rem', color: '#555', marginTop: 4 }}>
+            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1333fa', marginTop: 4 }}>
               You are all set. Please fill in the form below so we can send you Care Coins.
             </p>
           </div>
