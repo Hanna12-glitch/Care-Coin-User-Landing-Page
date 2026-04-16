@@ -10,6 +10,13 @@ export default function Onboarding() {
   const { activeAddress, transactionSigner } = useWallet()
   const navigate = useNavigate()
 
+  // Logout-Redirect
+  useEffect(() => {
+  if (!activeAddress) {
+    navigate('/')
+  }
+  }, [activeAddress, navigate])
+  
   const [fundStatus, setFundStatus] = useState<'idle' | 'funding' | 'funded' | 'error'>('idle')
   const [optInStatus, setOptInStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [optInError, setOptInError] = useState('')
