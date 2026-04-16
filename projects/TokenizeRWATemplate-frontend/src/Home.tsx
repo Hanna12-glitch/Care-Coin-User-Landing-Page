@@ -47,9 +47,10 @@ export default function Home() {
                 <p className="text-xs text-[#141938]/40 dark:text-slate-500 text-center font-medium">
                   We'll send you a one-time login link. No password needed.
                 </p>
-                <p className="text-sm text-[#141938]/50 dark:text-slate-400 font-medium">
-                  Free to join. No crypto knowledge needed.
+                <p className="text-xs text-[#141938]/40 dark:text-slate-500 text-center font-medium">
+                  This helps us find the right partners for Project Care Coin.
                 </p>
+                
               </div>
             )}
           </div>
@@ -130,7 +131,7 @@ export default function Home() {
         </div>
         <h3 className="text-lg font-extrabold text-white mb-2">Redeem Your Care Coins</h3>
         <p className="text-sm text-white/60 leading-relaxed">
-          Choose what you would like in exchange for your care coins. This helps us find the right partners for Project Care Coin.
+          Choose what you would like in exchange for your care coins.
         </p>
       </div>
 
