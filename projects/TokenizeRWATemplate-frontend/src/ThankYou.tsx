@@ -38,25 +38,7 @@ export default function ThankYou() {
 
        
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-left space-y-3">
-          <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">
-            What happens next
-          </h2>
-          <ol className="space-y-2 text-sm text-gray-600">
-            <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-orange-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">1</span>
-              <span>We review your care work submission (usually within 24 hours).</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-orange-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">2</span>
-              <span>Care Coins land in your wallet — 1 hour of care = 1 Care Coin.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-orange-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">3</span>
-              <span>Choose how to use your coins — see the options in Redeem.</span>
-            </li>
-          </ol>
-        </div>
+       
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <button
