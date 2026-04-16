@@ -3,23 +3,20 @@ import algosdk from 'algosdk'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-
 const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
 
 export default function Onboarding() {
   const { activeAddress, transactionSigner } = useWallet()
   const navigate = useNavigate()
-  
 
-  // Logout-Redirect
   const hasBeenConnected = useRef(false)
   useEffect(() => {
-  if (activeAddress) {
-    hasBeenConnected.current = true
-  } else if (hasBeenConnected.current) {
-    navigate('/')
-  }
+    if (activeAddress) {
+      hasBeenConnected.current = true
+    } else if (hasBeenConnected.current) {
+      navigate('/')
+    }
   }, [activeAddress, navigate])
 
   const [fundStatus, setFundStatus] = useState<'idle' | 'funding' | 'funded' | 'error'>('idle')
@@ -36,10 +33,19 @@ export default function Onboarding() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address: activeAddress }),
     })
-      .then((r) => r.json())
-      .then(() => setFundStatus('funded'))
-      .catch(() => setFundStatus('error'))
+      .then(async (r) => {
+        const data = await r.json()
+        console.log('Fund-wallet response:', r.status, data) // ← NEU
+        if (!r.ok) throw new Error(`HTTP ${r.status}: ${JSON.stringify(data)}`)
+        setFundStatus('funded')
+      })
+      .catch((err) => {
+        console.error('Fund-wallet frontend error:', err) // ← NEU
+        setFundStatus('error')
+      })
   }, [activeAddress])
+
+  // ... Rest bleibt identisch
 
   // Step 2: Check if already opted in
   useEffect(() => {

@@ -21,31 +21,22 @@ export default function ThankYou() {
   if (!activeAddress) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center px-4 py-16">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
       <div className="max-w-lg w-full mx-auto space-y-6 text-center">
 
         <div className="flex justify-center">
-          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
-            <span className="text-4xl">💛</span>
+          <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center">
           </div>
         </div>
 
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-teal-800">Thank you!</h1>
           <p className="text-gray-500 text-base leading-relaxed">
-            Your care work has been recorded. We will review your entry and
-            send Care Coins directly to your wallet within 24 hours.
+            Your care work has been recorded. We will send Care Coins directly to your wallet within 24 hours.
           </p>
         </div>
 
-        {activeAddress && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-left space-y-1">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Care Coins will be sent to
-            </p>
-            <p className="text-xs font-mono text-gray-700 break-all">{activeAddress}</p>
-          </div>
-        )}
+       
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-left space-y-3">
           <h2 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">
