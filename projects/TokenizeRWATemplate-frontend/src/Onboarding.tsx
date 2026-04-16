@@ -101,7 +101,10 @@ export default function Onboarding() {
         This is a research pilot. Your care work matters — and we want to recognise it.
       </p>
 
-    
+    {/* TEMP DEBUG */}
+    <p style={{ color: 'red', fontSize: '0.75rem' }}>
+      fundStatus: {fundStatus} | optInStatus: {optInStatus} | alreadyOptedIn: {String(alreadyOptedIn)}
+    </p>
 
       {/* Step 1: Welcome Fund */}
       {fundStatus === 'funding' && (
