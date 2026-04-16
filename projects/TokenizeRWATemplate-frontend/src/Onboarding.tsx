@@ -104,7 +104,10 @@ export default function Onboarding() {
         Welcome to Care Coin
       </h1>
       <p style={{ marginBottom: '2rem', color: '#555' }}>
-        This is a research pilot. Your care work matters — and we want to recognise it.
+        This is a research pilot.
+      </p>
+      <p style={{ marginBottom: '2rem', color: '#555' }}>
+        Your care work matters — and we want to recognise it.
       </p>
 
     
@@ -122,9 +125,9 @@ export default function Onboarding() {
       {/* Step 2: Opt-In */}
       {(fundStatus === 'funded' || fundStatus === 'error') && optInStatus !== 'done' && !alreadyOptedIn && (
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '1.5rem', marginBottom: '1rem' }}>
-          <strong>Enable Care Coin</strong>
+      
           <p style={{ fontSize: '0.875rem', color: '#555', margin: '0.5rem 0 1rem' }}>
-            One quick wallet step so we can send you Care Coins.
+            Please accept our currency so we can send you Care Coins.
           </p>
           {optInError && (
             <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{optInError}</p>
@@ -133,7 +136,7 @@ export default function Onboarding() {
             onClick={handleOptIn}
             disabled={optInStatus === 'loading'}
             style={{
-              width: '100%', padding: '0.875rem', background: '#0d9488', color: '#fff',
+              width: '100%', padding: '0.875rem', background: '#1333fa', color: '#fff',
               border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1rem', cursor: 'pointer',
             }}
           >

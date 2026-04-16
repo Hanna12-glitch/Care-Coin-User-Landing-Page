@@ -44,12 +44,10 @@ export default function Home() {
                 >
                   Sign in with Email
                 </button>
-                <p className="text-xs text-[#141938]/40 dark:text-slate-500 text-center font-medium">
+                <p className="text-s text-[#141938]/70 dark:text-slate-500 text-center font-medium">
                   We'll send you a one-time login link. No password needed.
                 </p>
-                <p className="text-xs text-[#141938]/40 dark:text-slate-500 text-center font-medium">
-                  This helps us find the right partners for Project Care Coin.
-                </p>
+                
                 
               </div>
             )}
@@ -87,7 +85,7 @@ export default function Home() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
 
       {/* Step 1 — Sign In */}
-      <div className="rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition group">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-7 transition group">
         <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
           1
         </div>
@@ -98,7 +96,7 @@ export default function Home() {
       </div>
 
       {/* Step 2 — Log Your Care Work */}
-      <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+      <div className="group rounded-3xl border border-white/10 bg-white/5 p-7 transition">
         <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
           2
         </div>
@@ -114,7 +112,7 @@ export default function Home() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
       {/* Step 3 — Receive Care Coins */}
-      <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+      <div className="group rounded-3xl border border-white/10 bg-white/5  p-7 transition">
         <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
           3
         </div>
@@ -125,7 +123,7 @@ export default function Home() {
       </div>
 
       {/* Step 4 — Redeem Your Care Coins */}
-      <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
+      <div className="group rounded-3xl border border-white/10 bg-white/5 p-7 transition">
         <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
           4
         </div>
