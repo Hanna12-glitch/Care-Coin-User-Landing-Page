@@ -32,7 +32,7 @@ export default function ThankYou() {
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-teal-800">Thank you!</h1>
           <p className="text-gray-500 text-base leading-relaxed">
-            Your care work has been recorded. We will send Care Coins directly to your wallet within 24 hours.
+            Your care work has been recorded. We will send Care Coins directly to your wallet within 24 hours and notify you via e-mail.
           </p>
         </div>
 
@@ -44,15 +44,15 @@ export default function ThankYou() {
           </h2>
           <ol className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">1</span>
+              <span className="shrink-0 w-5 h-5 rounded-full bg-orange-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">1</span>
               <span>We review your care work submission (usually within 24 hours).</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">2</span>
+              <span className="shrink-0 w-5 h-5 rounded-full bg-orange-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">2</span>
               <span>Care Coins land in your wallet — 1 hour of care = 1 Care Coin.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center mt-0.5">3</span>
+              <span className="shrink-0 w-5 h-5 rounded-full bg-orange-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">3</span>
               <span>Choose how to use your coins — see the options in Redeem.</span>
             </li>
           </ol>
@@ -61,7 +61,7 @@ export default function ThankYou() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm transition-all"
+            className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-all"
           >
             View my Dashboard →
           </button>

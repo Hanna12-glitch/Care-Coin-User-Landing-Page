@@ -60,16 +60,16 @@ export default function Home() {
       <div className="bg-[#1333fa] dark:bg-[#1333fa]/80">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">117bn hours</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Germany alone on top of paid jobs</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">311bn hours</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Europe alone on top of paid jobs</p>
           </div>
           <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Recognition of this work in the economy — Care Coin changes that</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">135M+ people in EU</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">juggle care work and employment simultaneously</p>
           </div>
           <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Recognition of this work in the economy — Care Coin changes that</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">44% more care</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">is provided by women who earn less and are more likely to burn-out</p>
           </div>
         </div>
       </div>
@@ -103,7 +103,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-extrabold text-white mb-2">Log Your Care Work</h3>
               <p className="text-sm text-white/60 leading-relaxed">
-                Put in the amount of care work and what type.
+                We help you with a short questionnaire.
               </p>
             </div>
 
@@ -114,7 +114,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-extrabold text-white mb-2">Receive Care Coins</h3>
               <p className="text-sm text-white/60 leading-relaxed">
-                Care Coin will send your care coins to your account. One hour = one care coin.
+                Care Coin will send your care coins to your account.
               </p>
             </div>
 
@@ -125,59 +125,13 @@ export default function Home() {
             <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
               4
             </div>
-            <h3 className="text-lg font-extrabold text-white mb-2">Redeem Your Reward</h3>
+            <h3 className="text-lg font-extrabold text-white mb-2">Redeem Your Care-Coins</h3>
             <p className="text-sm text-white/60 leading-relaxed max-w-xl">
-              Choose what you would like to exchange your care coins for. This helps us find the right partners for Project Care Coin.
+              Choose what you would like in exchange for your care coins for. This helps us find the right partners for Project Care Coin.
             </p>
           </div>
-
-        </div>
-      </div>
-
-      {/* Member Card Section */}
-      <div className="bg-[#FFFFFF] dark:bg-[#1a1035]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-
-            {/* Text left */}
-            <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#fa1179] mb-4">
-                ✦ Exclusive
-              </p>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#141938] dark:text-white mb-6 leading-tight">
-                Your Member Card
-              </h2>
-              <p className="text-[#141938]/70 dark:text-slate-300 text-base leading-relaxed">
-                Project Care-Coin sends you a digital member ID. It is bound to your wallet, cannot be transferred or copied. It will always prove you are an early supporter and eligible for benefits in the future.
-              </p>
-              <div className="mt-8 flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                  <span className="text-[#141938] dark:text-gray-200 text-sm font-medium">Bound to your wallet — non-transferable</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                  <span className="text-[#141938] dark:text-gray-200 text-sm font-medium">Permanent proof of early support</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-xl bg-[#fa1179] text-white font-bold text-sm">✓</span>
-                  <span className="text-[#141938] dark:text-gray-200 text-sm font-medium">Unlocks future benefits & rewards</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Image right */}
-            <div className="flex justify-center">
-              <img
-                src="/Care-Coin-NFT.jpg"
-                alt="Project Care-Coin Member Card NFT"
-                className="w-full max-w-xs shadow-2xl shadow-[#1333fa]/20"
-                loading="lazy"
-              />
-            </div>
-
-          </div>
-        </div>
+         
+          </div>       
       </div>
 
       {/* CTA Section */}
@@ -191,11 +145,9 @@ export default function Home() {
             <span className="text-[#fb9b0c]">your Care Coin?</span>
           </h2>
           <p className="text-lg text-[#fddeef]/80 mb-2 max-w-xl mx-auto font-medium leading-relaxed">
-            Sign in with your email to get started. It takes 30 seconds.
+            Sign in with your email to get started.
           </p>
-          <p className="text-sm text-white/40 mb-10 font-medium">
-            No crypto wallet needed. No hidden fees. Just your care, recognised. 💛
-          </p>
+        
 
           {activeAddress ? (
             <div className="inline-flex items-center gap-3 px-12 py-4 rounded-2xl font-extrabold text-lg bg-[#fa1179] text-white shadow-xl shadow-[#fa1179]/30">
