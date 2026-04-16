@@ -5,7 +5,7 @@ const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ALGOD_PORT = 443
 const ALGOD_TOKEN = ''
 const FUND_AMOUNT_ALGO = 1_000_000 // 1 ALGO in microAlgo
-const MIN_BALANCE_THRESHOLD = 200_200_000 // 0.2 ALGO — nur funden wenn darunter
+const MIN_BALANCE_THRESHOLD = 200_000 // 0.2 ALGO — nur funden wenn darunter
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS für Codespace + Vercel
