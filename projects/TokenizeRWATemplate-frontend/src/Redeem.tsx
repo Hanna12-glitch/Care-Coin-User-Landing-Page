@@ -5,14 +5,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 const REWARD_CATEGORIES = [
-  { id: 'wellness',  label: 'Wellness Voucher',   emoji: '💆', desc: 'Massage, spa or yoga' },
-  { id: 'financial', label: 'Financial Coaching', emoji: '💰', desc: '1:1 with an advisor' },
-  { id: 'shopping',  label: 'Shopping Voucher',   emoji: '🛍️', desc: 'Groceries or household' },
-  { id: 'childcare', label: 'Childcare Support',  emoji: '👶', desc: 'Temporary childcare' },
-  { id: 'education', label: 'Education',          emoji: '📚', desc: 'Course or workshop' },
-  { id: 'culture',   label: 'Culture & Leisure',  emoji: '🎭', desc: 'Cinema, theatre, museum' },
-  { id: 'health',    label: 'Health Check-Up',    emoji: '🏥', desc: 'Medical or preventive care' },
-  { id: 'other',     label: 'My own idea',        emoji: '✨', desc: 'Tell us what you want!' },
+  { id: 'wellness',  label: 'Wellness Voucher',   desc: 'Massage, spa or yoga' },
+  { id: 'financial', label: 'Financial Coaching', desc: '1:1 with an advisor' },
+  { id: 'shopping',  label: 'Shopping Voucher',   desc: 'Groceries or household' },
+  { id: 'fashion',    label: 'Fashion',            desc: 'Fashion Voucher' },
+  { id: 'education', label: 'Education',          desc: 'Course or workshop' },
+  { id: 'culture',   label: 'Culture & Leisure',  desc: 'Cinema, theatre, museum' },
+  { id: 'health',    label: 'Health Check-Up',    desc: 'Medical or preventive care' },
+  { id: 'other',     label: 'My own idea',        desc: 'Tell us what you want!' },
 ]
 
 type Status = 'idle' | 'signing' | 'submitting' | 'success' | 'error'
@@ -138,7 +138,7 @@ export default function Redeem() {
           ← Back to Dashboard
         </Link>
 
-        <p className="text-xs font-bold uppercase tracking-widest text-[#1333fa] mb-2">✦ Redeem</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-[#1333fa] mb-2">Redeem</p>
         <h1 className="text-3xl font-extrabold text-white mb-2">Choose your reward</h1>
         <p className="text-white/50 mb-10">
           What would you most like for your care work? Your choice helps us find the right partners.
@@ -158,7 +158,7 @@ export default function Redeem() {
                     : 'border-white/10 bg-white/5 text-white/50 hover:border-white/30 hover:text-white'
                 }`}
               >
-                <span className="text-2xl">{reward.emoji}</span>
+                
                 <span className="text-xs font-semibold leading-tight">{reward.label}</span>
                 <span className="text-xs text-white/30 leading-tight hidden sm:block">{reward.desc}</span>
               </button>

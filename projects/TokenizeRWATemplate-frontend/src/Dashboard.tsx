@@ -73,7 +73,7 @@ export default function Dashboard() {
       {/* Redeem Reward */}
       <Link
         to="/redeem"
-        className="group rounded-3xl border-2 border-[#1333fa]/30 bg-[#1333fa]/5 hover:bg-[#1333fa]/10 hover:border-[#1333fa]/60 p-7 transition">
+        className="group rounded-3xl border-2 border-[#1333fa]/30 bg-[#1333fa]/5 hover:bg-[#1333fa]/20 hover:border-[#1333fa]/60 p-7 transition">
         <h3 className="text-xl font-extrabold text-white mb-2">Redeem Reward</h3>
         <p className="text-sm text-white/60 leading-relaxed mb-5">
         Exchange your CARE tokens for a reward of your choice. Help us find the right partners.
@@ -85,7 +85,7 @@ export default function Dashboard() {
         {/* Hints */}
         {!loading && info.careBalance === 0 && (
           <div className="mt-8 rounded-2xl border border-[#ffc2e8]/15 bg-[#ffc2e8]/5 p-5 text-sm text-white/50">
-            You are part of building our currency
+            Thank You for being part of building care-coin!
           </div>
         )}
         {!import.meta.env.VITE_CARE_COIN_ASSET_ID && (
