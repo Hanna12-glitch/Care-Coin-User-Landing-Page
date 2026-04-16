@@ -37,7 +37,12 @@ function buildSupportedWallets(): SupportedWallet[] {
       options: {
         clientId: web3AuthClientId,
         web3AuthNetwork: 'sapphire_devnet',
-        uiConfig: { appName: 'Project Care Coin', mode: 'auto' },
+        uiConfig: { appName: 'Project Care Coin', mode: 'auto', theme: {
+        primary: '#fb9b0c',      // Button-Farbe
+        onPrimary: '#ffffff',    // Text auf Button
+        }, 
+      },
+        
         modalConfig: {
           auth: {
             label: 'auth',
