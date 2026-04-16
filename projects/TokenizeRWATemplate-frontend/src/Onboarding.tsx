@@ -139,7 +139,7 @@ export default function Onboarding() {
       {/* Step 3: Form */}
       {(optInStatus === 'done' || alreadyOptedIn) && (
         <div>
-          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ background: '#dbf5fb', border: '1px solid #1333fa', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span>✅</span>
               <strong>Care Coin enabled</strong>
