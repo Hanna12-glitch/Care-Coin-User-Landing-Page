@@ -101,14 +101,7 @@ export default function Onboarding() {
         This is a research pilot. Your care work matters — and we want to recognise it.
       </p>
 
-      {/* Wallet connected */}
-      <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ color: '#16a34a' }}>●</span>
-          <strong>Wallet connected</strong>
-        </div>
-        <div style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>{activeAddress}</div>
-      </div>
+    
 
       {/* Step 1: Welcome Fund */}
       {fundStatus === 'funding' && (
