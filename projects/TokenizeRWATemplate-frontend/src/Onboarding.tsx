@@ -43,17 +43,18 @@ export default function Onboarding() {
 
   // Step 3: Listen for form submission via postMessage
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (
-        typeof event.data === 'object' &&
-        event.data?.type === 'formsapp' &&
-        event.data?.action === 'submitted'
-      ) {
-        navigate('/thank-you')
-      }
+  const handleMessage = (event: MessageEvent) => {
+    console.log('postMessage received:', event.origin, event.data)  // ← NEU
+    if (
+      typeof event.data === 'object' &&
+      event.data?.type === 'formsapp' &&
+      event.data?.action === 'submitted'
+    ) {
+      navigate('/thank-you')
     }
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
+  }
+  window.addEventListener('message', handleMessage)
+  return () => window.removeEventListener('message', handleMessage)
   }, [navigate])
 
   // Step 4: Opt-in handler
