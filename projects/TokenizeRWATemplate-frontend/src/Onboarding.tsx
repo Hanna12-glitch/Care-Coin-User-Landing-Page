@@ -117,7 +117,7 @@ export default function Onboarding() {
       )}
 
       {/* Step 2: Opt-In */}
-      {fundStatus === 'funded' && optInStatus !== 'done' && !alreadyOptedIn && (
+      {(fundStatus === 'funded' || fundStatus === 'error') && optInStatus !== 'done' && !alreadyOptedIn && (
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '1.5rem', marginBottom: '1rem' }}>
           <strong>Enable Care Coin</strong>
           <p style={{ fontSize: '0.875rem', color: '#555', margin: '0.5rem 0 1rem' }}>
