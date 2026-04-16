@@ -46,7 +46,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#141938] text-white px-4 py-12">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-[600px] mx-auto">
 
         {/* Welcome */}
         <div className="mb-10">
