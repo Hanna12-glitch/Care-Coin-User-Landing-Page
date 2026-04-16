@@ -1,7 +1,8 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 
 const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
@@ -9,14 +10,18 @@ const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
 export default function Onboarding() {
   const { activeAddress, transactionSigner } = useWallet()
   const navigate = useNavigate()
+  
 
   // Logout-Redirect
+  const hasBeenConnected = useRef(false)
   useEffect(() => {
-  if (!activeAddress) {
+  if (activeAddress) {
+    hasBeenConnected.current = true
+  } else if (hasBeenConnected.current) {
     navigate('/')
   }
   }, [activeAddress, navigate])
-  
+
   const [fundStatus, setFundStatus] = useState<'idle' | 'funding' | 'funded' | 'error'>('idle')
   const [optInStatus, setOptInStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [optInError, setOptInError] = useState('')
