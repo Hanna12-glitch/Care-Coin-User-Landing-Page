@@ -65,7 +65,7 @@ export default function Home() {
             <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Europe alone on top of paid jobs</p>
           </div>
           <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">135M+ people in EU</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">135M+ people</p>
             <p className="mt-1 text-sm text-white/80 font-medium">juggle care work and employment simultaneously</p>
           </div>
           <div>
