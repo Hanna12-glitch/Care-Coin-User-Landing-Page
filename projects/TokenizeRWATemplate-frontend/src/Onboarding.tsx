@@ -49,15 +49,17 @@ export default function Onboarding() {
 
   // Step 2: Check if already opted in
   useEffect(() => {
-    if (!activeAddress || fundStatus !== 'funded') return
-    const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
-    algod.accountInformation(activeAddress).do().then((info: { assets?: { assetId: bigint }[] }) => {
-      const assets = info.assets ?? []
-      const opted = assets.some((a) => Number(a.assetId) === ASSET_ID)
-      setAlreadyOptedIn(opted)
-      if (opted) setOptInStatus('done')
-    })
-  }, [activeAddress, fundStatus])
+  if (!activeAddress || fundStatus !== 'funded') return
+  const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
+  algod.accountInformation(activeAddress).do().then((info: { assets?: { assetId: bigint }[] }) => {
+    console.log('ASSET_ID:', ASSET_ID, typeof ASSET_ID)  // ← NEU
+    console.log('assets:', info.assets)                   // ← NEU
+    const assets = info.assets ?? []
+    const opted = assets.some((a) => Number(a.assetId) === ASSET_ID)
+    setAlreadyOptedIn(opted)
+    if (opted) setOptInStatus('done')
+  })
+}, [activeAddress, fundStatus])
 
   // Step 3: Listen for form submission via postMessage
   useEffect(() => {
