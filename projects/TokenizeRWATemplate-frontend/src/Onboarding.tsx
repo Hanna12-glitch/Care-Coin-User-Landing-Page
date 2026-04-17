@@ -104,7 +104,10 @@ export default function Onboarding() {
 
   // ─── Step 3: Activate ─────────────────────────────────────────────────────
   const handleActivate = async () => {
-    if (!activeAddress || !transactionSigner) return
+  console.log('activeAddress:', activeAddress)
+  console.log('transactionSigner type:', typeof transactionSigner)
+  console.log('transactionSigner:', transactionSigner)
+  if (!activeAddress || !transactionSigner) return
     setStep('activating')
     setErrorMsg('')
 
