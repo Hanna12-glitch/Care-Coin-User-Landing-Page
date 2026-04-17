@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
 
-type Step = 'idle' | 'funding' | 'checkingOptIn' | 'readyToActivate' | 'activating' | 'done' | 'error'
+type Step = 'idle' | 'funding' | 'checkingOptIn' | 'readyToActivate' | 'activating' | 'confirming' | 'done' | 'error'
 
 export default function Onboarding() {
   const { activeAddress, transactionSigner } = useWallet()
@@ -14,7 +14,7 @@ export default function Onboarding() {
   const [step, setStep] = useState<Step>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Redirect to home if wallet disconnects after being connected
+  // Redirect to home if wallet disconnects
   const hasBeenConnected = useRef(false)
   useEffect(() => {
     if (activeAddress) {
@@ -86,7 +86,7 @@ export default function Onboarding() {
     }
   }
 
-  // ─── Step 3: Activate = Opt-In + Welcome Bonus ───────────────────────────
+  // ─── Step 3: Activate = Opt-In + wait for confirmation + Welcome Bonus ───
   const handleActivate = async () => {
     if (!activeAddress || !transactionSigner) return
     setStep('activating')
@@ -106,11 +106,20 @@ export default function Onboarding() {
 
       await transactionSigner([txn], [0])
 
-      await fetch('/api/send-care', {
+      // Warte auf Blockchain-Bestätigung (~4 Runden = ~16 Sekunden)
+      setStep('confirming')
+      const txId = txn.txID().toString()
+      await algosdk.waitForConfirmation(algod, txId, 4)
+      console.log('Opt-in confirmed:', txId)
+
+      // Jetzt erst Welcome Bonus senden
+      const res = await fetch('/api/send-care', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address: activeAddress, amount: 10 }),
       })
+      const data = await res.json()
+      console.log('send-care response:', res.status, data)
 
       setStep('done')
     } catch (e) {
@@ -171,10 +180,20 @@ export default function Onboarding() {
         </div>
       )}
 
-      {/* Activating */}
+      {/* Activating — waiting for wallet signature */}
       {step === 'activating' && (
         <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
-          <strong>⏳ Activating — please confirm in your wallet…</strong>
+          <strong>⏳ Please confirm in your wallet…</strong>
+        </div>
+      )}
+
+      {/* Confirming — waiting for blockchain */}
+      {step === 'confirming' && (
+        <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
+          <strong>⏳ Confirming on Algorand…</strong>
+          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>
+            This takes about 15 seconds. Please wait.
+          </p>
         </div>
       )}
 
@@ -182,9 +201,7 @@ export default function Onboarding() {
       {step === 'done' && (
         <div>
           <div style={{ background: '#e5f8fc', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <strong>Care Coin enabled ✅</strong>
-            </div>
+            <strong>Care Coin enabled ✅</strong>
             <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1333fa', marginTop: 4 }}>
               You are all set. Please fill in the form below so we can send you Care Coins.
             </p>
