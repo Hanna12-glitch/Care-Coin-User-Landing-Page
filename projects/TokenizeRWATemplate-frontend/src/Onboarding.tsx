@@ -35,55 +35,59 @@ export default function Onboarding() {
     })
       .then(async (r) => {
         const data = await r.json()
-        console.log('Fund-wallet response:', r.status, data) // ← NEU
+        console.log('Fund-wallet response:', r.status, data)
         if (!r.ok) throw new Error(`HTTP ${r.status}: ${JSON.stringify(data)}`)
         setFundStatus('funded')
       })
       .catch((err) => {
-        console.error('Fund-wallet frontend error:', err) // ← NEU
+        console.error('Fund-wallet frontend error:', err)
         setFundStatus('error')
       })
   }, [activeAddress])
 
-  // ... Rest bleibt identisch
-
   // Step 2: Check if already opted in
   useEffect(() => {
-  if (!activeAddress || fundStatus !== 'funded') return
-  const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
-  algod.accountInformation(activeAddress).do().then((info: { assets?: { assetId: bigint }[] }) => {
-    console.log('ASSET_ID:', ASSET_ID, typeof ASSET_ID)  // ← NEU
-    console.log('assets:', info.assets)                   // ← NEU
-    const assets = info.assets ?? []
-    const opted = assets.some((a) => Number(a.assetId) === ASSET_ID)
-    setAlreadyOptedIn(opted)
-    if (opted) setOptInStatus('done')
-  })
-}, [activeAddress, fundStatus])
+    if (!activeAddress || fundStatus !== 'funded') return
+    const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
+    algod.accountInformation(activeAddress).do().then((info: { assets?: { assetId: bigint }[] }) => {
+      console.log('ASSET_ID:', ASSET_ID, typeof ASSET_ID)
+      console.log('assets:', info.assets)
+      const assets = info.assets ?? []
+      const opted = assets.some((a) => Number(a.assetId) === ASSET_ID)
+      console.log('alreadyOptedIn:', opted)
+      setAlreadyOptedIn(opted)
+      if (opted) setOptInStatus('done')
+    })
+  }, [activeAddress, fundStatus])
 
   // Step 3: Listen for form submission via postMessage
   useEffect(() => {
-  const handleMessage = (event: MessageEvent) => {
-    if (
-      event.origin.includes('forms.app') &&
-      typeof event.data === 'string' &&
-      event.data.startsWith('formsapp-formSubmitted')
-    ) {
-      navigate('/thank-you')
+    const handleMessage = (event: MessageEvent) => {
+      if (
+        event.origin.includes('forms.app') &&
+        typeof event.data === 'string' &&
+        event.data.startsWith('formsapp-formSubmitted')
+      ) {
+        navigate('/thank-you')
+      }
     }
-  }
-  window.addEventListener('message', handleMessage)
-  return () => window.removeEventListener('message', handleMessage)
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
   }, [navigate])
 
   // Step 4: Opt-in handler
   const handleOptIn = async () => {
-    if (!activeAddress || !transactionSigner) return
+    console.log('handleOptIn called', { activeAddress, hasSigner: !!transactionSigner })
+    if (!activeAddress || !transactionSigner) {
+      console.warn('Early return — missing address or signer', { activeAddress, transactionSigner })
+      return
+    }
     setOptInStatus('loading')
     setOptInError('')
     try {
       const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
       const params = await algod.getTransactionParams().do()
+      console.log('Transaction params:', params)
       const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
         sender: activeAddress,
         receiver: activeAddress,
@@ -91,10 +95,12 @@ export default function Onboarding() {
         assetIndex: ASSET_ID,
         suggestedParams: params,
       })
+      console.log('Sending txn to signer...', txn)
       await transactionSigner([txn], [0])
+      console.log('Opt-in success!')
       setOptInStatus('done')
     } catch (e) {
-      console.error(e)
+      console.error('Opt-in error:', e)
       setOptInError('Opt-in fehlgeschlagen. Bitte prüfe dein Wallet und versuche es erneut.')
       setOptInStatus('error')
     }
@@ -112,8 +118,6 @@ export default function Onboarding() {
         Your care work matters — and we want to recognise it.
       </p>
 
-    
-
       {/* Step 1: Welcome Fund */}
       {fundStatus === 'funding' && (
         <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
@@ -127,7 +131,6 @@ export default function Onboarding() {
       {/* Step 2: Opt-In */}
       {(fundStatus === 'funded' || fundStatus === 'error') && optInStatus !== 'done' && !alreadyOptedIn && (
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '1.5rem', marginBottom: '1rem' }}>
-      
           <p style={{ fontSize: '0.875rem', color: '#555', margin: '0.5rem 0 1rem' }}>
             Please accept our currency so we can send you Care Coins.
           </p>
@@ -152,7 +155,6 @@ export default function Onboarding() {
         <div>
           <div style={{ background: '#e5f8fc', border: '0px solid #1333fa', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            
               <strong>Care Coin enabled</strong>
             </div>
             <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1333fa', marginTop: 4 }}>
