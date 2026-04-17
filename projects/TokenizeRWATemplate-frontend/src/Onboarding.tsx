@@ -1,6 +1,10 @@
 import { useWallet } from '@txnlab/use-wallet-react'
+import algosdk from 'algosdk'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
+const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
 
 export default function Onboarding() {
   const { activeAddress } = useWallet()
@@ -36,25 +40,41 @@ export default function Onboarding() {
     if (!activeAddress || sendStarted.current) return
     sendStarted.current = true
 
-    fetch('/api/send-care', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address: activeAddress, amount: 10 }),
-    })
-      .then(async (r) => {
-        const data = await r.json()
-        console.log('send-care:', r.status, data)
-        if (r.ok) {
-          setCareSent(true)
-        } else {
-          setCareSent(true)
+    const run = async () => {
+      try {
+        // Check if user already has CARE tokens
+        const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
+        const info = await algod.accountInformation(activeAddress).do() as {
+          assets?: { assetId: bigint; amount: bigint }[]
         }
-      })
-      .catch((err) => {
+        const careAsset = (info.assets ?? []).find((a) => Number(a.assetId) === ASSET_ID)
+        const careBalance = careAsset ? Number(careAsset.amount) : 0
+        console.log('CARE balance:', careBalance)
+
+        if (careBalance > 0) {
+          // Already has tokens — skip send
+          console.log('Already has CARE tokens, skipping send-care')
+          setCareSent(true)
+          return
+        }
+
+        // Send welcome bonus
+        const res = await fetch('/api/send-care', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: activeAddress, amount: 10 }),
+        })
+        const data = await res.json()
+        console.log('send-care:', res.status, data)
+        setCareSent(true)
+      } catch (err) {
         console.error('send-care error:', err)
         setError('Welcome bonus konnte nicht gesendet werden.')
         setCareSent(true)
-      })
+      }
+    }
+
+    run()
   }, [activeAddress])
 
   return (
