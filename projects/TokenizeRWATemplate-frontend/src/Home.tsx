@@ -87,8 +87,9 @@ export default function Home() {
           assetIndex: ASSET_ID,
           suggestedParams: params,
         })
-        const result = await transactionSigner([txn], [0])
-        console.log('transactionSigner result:', result)
+        const signedTxns = await transactionSigner([txn], [0])
+await algod.sendRawTransaction(signedTxns[0]).do()
+console.log('Opt-in tx submitted ✅')
 
         // Step 5: Wait until opt-in confirmed on chain
         setSetupStep('confirming')
