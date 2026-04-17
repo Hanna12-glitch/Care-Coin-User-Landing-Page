@@ -87,7 +87,8 @@ export default function Home() {
           assetIndex: ASSET_ID,
           suggestedParams: params,
         })
-        await transactionSigner([txn], [0])
+        const result = await transactionSigner([txn], [0])
+        console.log('transactionSigner result:', result)
 
         // Step 5: Wait until opt-in confirmed on chain
         setSetupStep('confirming')
