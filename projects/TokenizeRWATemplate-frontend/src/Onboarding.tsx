@@ -8,13 +8,14 @@ const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
 
 type Step = 'idle' | 'funding' | 'checkingOptIn' | 'readyToActivate' | 'activating' | 'confirming' | 'done' | 'error'
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export default function Onboarding() {
   const { activeAddress, transactionSigner } = useWallet()
   const navigate = useNavigate()
   const [step, setStep] = useState<Step>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Redirect to home if wallet disconnects
   const hasBeenConnected = useRef(false)
   useEffect(() => {
     if (activeAddress) {
@@ -24,7 +25,6 @@ export default function Onboarding() {
     }
   }, [activeAddress, navigate])
 
-  // Listen for forms.app submission → navigate to thank-you
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (
@@ -39,7 +39,7 @@ export default function Onboarding() {
     return () => window.removeEventListener('message', handleMessage)
   }, [navigate])
 
-  // ─── Step 1: Auto-fund on mount ───────────────────────────────────────────
+  // ─── Step 1: Auto-fund ────────────────────────────────────────────────────
   useEffect(() => {
     if (!activeAddress) return
     setStep('funding')
@@ -62,7 +62,7 @@ export default function Onboarding() {
       })
   }, [activeAddress])
 
-  // ─── Step 2: Check opt-in status ──────────────────────────────────────────
+  // ─── Step 2: Check opt-in ─────────────────────────────────────────────────
   const checkOptIn = async () => {
     setStep('checkingOptIn')
     try {
@@ -86,7 +86,7 @@ export default function Onboarding() {
     }
   }
 
-  // ─── Step 3: Activate = Opt-In + wait for confirmation + Welcome Bonus ───
+  // ─── Step 3: Activate ─────────────────────────────────────────────────────
   const handleActivate = async () => {
     if (!activeAddress || !transactionSigner) return
     setStep('activating')
@@ -106,13 +106,10 @@ export default function Onboarding() {
 
       await transactionSigner([txn], [0])
 
-      // Warte auf Blockchain-Bestätigung (~4 Runden = ~16 Sekunden)
+      // Warte 6 Sekunden auf Blockchain-Bestätigung (~2 Runden)
       setStep('confirming')
-      const txId = txn.txID().toString()
-      await algosdk.waitForConfirmation(algod, txId, 4)
-      console.log('Opt-in confirmed:', txId)
+      await sleep(6000)
 
-      // Jetzt erst Welcome Bonus senden
       const res = await fetch('/api/send-care', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -120,6 +117,8 @@ export default function Onboarding() {
       })
       const data = await res.json()
       console.log('send-care response:', res.status, data)
+
+      if (!res.ok) throw new Error(`send-care HTTP ${res.status}: ${JSON.stringify(data)}`)
 
       setStep('done')
     } catch (e) {
@@ -135,31 +134,22 @@ export default function Onboarding() {
       <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
         Welcome to Care Coin
       </h1>
-      <p style={{ marginBottom: '0.5rem', color: '#555' }}>
-        This is a research pilot.
-      </p>
-      <p style={{ marginBottom: '2rem', color: '#555' }}>
-        Your care work matters — and we want to recognise it.
-      </p>
+      <p style={{ marginBottom: '0.5rem', color: '#555' }}>This is a research pilot.</p>
+      <p style={{ marginBottom: '2rem', color: '#555' }}>Your care work matters — and we want to recognise it.</p>
 
-      {/* Funding */}
       {step === 'funding' && (
         <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
           <strong>⏳ Preparing your wallet…</strong>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>
-            Sending your welcome ALGO. This takes a few seconds.
-          </p>
+          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>Sending your welcome ALGO. This takes a few seconds.</p>
         </div>
       )}
 
-      {/* Checking */}
       {step === 'checkingOptIn' && (
         <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
           <strong>⏳ Checking account status…</strong>
         </div>
       )}
 
-      {/* Ready to activate */}
       {step === 'readyToActivate' && (
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '1.5rem', marginBottom: '1rem' }}>
           <p style={{ fontSize: '0.875rem', color: '#555', margin: '0.5rem 0 1rem' }}>
@@ -180,24 +170,19 @@ export default function Onboarding() {
         </div>
       )}
 
-      {/* Activating — waiting for wallet signature */}
       {step === 'activating' && (
         <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
           <strong>⏳ Please confirm in your wallet…</strong>
         </div>
       )}
 
-      {/* Confirming — waiting for blockchain */}
       {step === 'confirming' && (
         <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
           <strong>⏳ Confirming on Algorand…</strong>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>
-            This takes about 15 seconds. Please wait.
-          </p>
+          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>This takes about 10 seconds. Please wait.</p>
         </div>
       )}
 
-      {/* Done — show form */}
       {step === 'done' && (
         <div>
           <div style={{ background: '#e5f8fc', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
@@ -206,14 +191,8 @@ export default function Onboarding() {
               You are all set. Please fill in the form below so we can send you Care Coins.
             </p>
           </div>
-
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '0.25rem' }}>
-            Tell us about your care work
-          </h2>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginBottom: '1rem' }}>
-            Your answers help us understand how to value care better.
-          </p>
-
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '0.25rem' }}>Tell us about your care work</h2>
+          <p style={{ fontSize: '0.875rem', color: '#666', marginBottom: '1rem' }}>Your answers help us understand how to value care better.</p>
           <iframe
             src="https://join-project-care-coin.forms.app/onboarding"
             width="100%"
@@ -224,7 +203,6 @@ export default function Onboarding() {
         </div>
       )}
 
-      {/* Error */}
       {step === 'error' && (
         <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
           <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{errorMsg}</p>
