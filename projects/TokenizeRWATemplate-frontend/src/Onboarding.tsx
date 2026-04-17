@@ -10,6 +10,22 @@ type Step = 'idle' | 'funding' | 'checkingOptIn' | 'readyToActivate' | 'activati
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
+// Poll until opt-in appears on chain (max ~30 seconds)
+const waitForOptIn = async (address: string, assetId: number): Promise<boolean> => {
+  const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
+  for (let i = 0; i < 10; i++) {
+    await sleep(3000)
+    const info = await algod.accountInformation(address).do() as {
+      assets?: { assetId: bigint }[]
+    }
+    const assets = info.assets ?? []
+    const opted = assets.some((a) => Number(a.assetId) === assetId)
+    console.log(`Opt-in check ${i + 1}/10:`, opted)
+    if (opted) return true
+  }
+  return false
+}
+
 export default function Onboarding() {
   const { activeAddress, transactionSigner } = useWallet()
   const navigate = useNavigate()
@@ -106,10 +122,15 @@ export default function Onboarding() {
 
       await transactionSigner([txn], [0])
 
-      // Warte 6 Sekunden auf Blockchain-Bestätigung (~2 Runden)
+      // Poll blockchain until opt-in is confirmed
       setStep('confirming')
-      await sleep(6000)
+      const confirmed = await waitForOptIn(activeAddress, ASSET_ID)
 
+      if (!confirmed) {
+        throw new Error('Opt-in nicht bestätigt nach 30 Sekunden.')
+      }
+
+      // Opt-in confirmed → send welcome bonus
       const res = await fetch('/api/send-care', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,7 +200,7 @@ export default function Onboarding() {
       {step === 'confirming' && (
         <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
           <strong>⏳ Confirming on Algorand…</strong>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>This takes about 10 seconds. Please wait.</p>
+          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: 4 }}>This takes about 10–15 seconds. Please wait.</p>
         </div>
       )}
 
