@@ -1,125 +1,240 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useCareCoinOptIn } from './useCareCoinOptIn'
 
-const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
-const ASSET_ID = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID)
+const CARE_ASSET_ID = Number((import.meta as any).env.VITE_CARE_COIN_ASSET_ID)
+const FORMS_APP_ID = '69de0aa001324e32c38f6893'
+const FORMS_APP_BASE_URL = 'https://6h6u8bjv.forms.app'
+const WALLET_FIELD_ID = '69de108c8ca500adbd32ae02'
+
+function loadFormsScript(callback: () => void) {
+  const existing = document.querySelector('script[src="https://forms.app/cdn/embed.js"]')
+  if (existing) { callback(); return }
+  const script = document.createElement('script')
+  script.src = 'https://forms.app/cdn/embed.js'
+  script.async = true
+  script.defer = true
+  script.onload = callback
+  document.body.appendChild(script)
+}
 
 export default function Onboarding() {
-  const { activeAddress } = useWallet()
   const navigate = useNavigate()
-  const [careSent, setCareSent] = useState(false)
-  const [error, setError] = useState('')
-  const sendStarted = useRef(false)
+  const { activeAddress, signTransactions } = useWallet()
+  const { status, refetch, algodClient } = useCareCoinOptIn(activeAddress)
 
-  const hasBeenConnected = useRef(false)
+  const [localOptedIn, setLocalOptedIn] = useState(false)
+  const [optInLoading, setOptInLoading] = useState(false)
+  const [optInError, setOptInError] = useState<string | null>(null)
+  const [fundingStatus, setFundingStatus] = useState<'idle' | 'checking' | 'funded' | 'skipped'>('idle')
+
+  const formInitializedRef = useRef(false)
+  const activeAddressRef = useRef(activeAddress)
+  useEffect(() => { activeAddressRef.current = activeAddress }, [activeAddress])
+
+  const isOptedIn = localOptedIn || status === 'opted-in'
+
+  // Logout-Redirect
   useEffect(() => {
-    if (activeAddress) {
-      hasBeenConnected.current = true
-    } else if (hasBeenConnected.current) {
-      navigate('/')
-    }
+    if (!activeAddress) navigate('/')
   }, [activeAddress, navigate])
 
+  // Welcome Fund: Balance prüfen und ggf. ALGO senden
+  useEffect(() => {
+    if (!activeAddress || fundingStatus !== 'idle') return
+    const checkAndFund = async () => {
+      setFundingStatus('checking')
+      try {
+        const res = await fetch('/api/fund-wallet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: activeAddress }),
+        })
+        const data = await res.json()
+        setFundingStatus(data.funded ? 'funded' : 'skipped')
+      } catch {
+        setFundingStatus('skipped') // In Codespaces: 404 → still ignorieren
+      }
+    }
+    checkAndFund()
+  }, [activeAddress, fundingStatus])
+
+  // Wenn User schon submitted hat → direkt zum Dashboard
+  useEffect(() => {
+    if (!activeAddress) return
+    if (status === 'loading') return
+    const alreadySubmitted = localStorage.getItem(`care-submitted-${activeAddress}`)
+    if (alreadySubmitted && isOptedIn) {
+      navigate('/dashboard')
+    }
+  }, [activeAddress, status, isOptedIn, navigate])
+
+  // forms.app postMessage → /thank-you
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      if (event.origin.includes('forms.app')) {
+        console.log('forms.app message:', event.data)
+      }
       if (
-        event.origin.includes('forms.app') &&
-        typeof event.data === 'string' &&
-        event.data.startsWith('formsapp-formSubmitted')
+        typeof event.data === 'object' &&
+        event.data?.type === 'formsapp' &&
+        event.data?.action === 'submitted'
       ) {
+        if (activeAddress) {
+          localStorage.setItem(`care-submitted-${activeAddress}`, 'true')
+        }
         navigate('/thank-you')
       }
     }
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [navigate])
+  }, [activeAddress, navigate])
 
-  useEffect(() => {
-    if (!activeAddress || sendStarted.current) return
-    sendStarted.current = true
+  // forms.app Callback-Ref
+  const initForm = useCallback((node: HTMLDivElement | null) => {
+    if (!node || formInitializedRef.current) return
+    node.setAttribute('formsappId', FORMS_APP_ID)
+    loadFormsScript(() => {
+      if (formInitializedRef.current) return
+      if (typeof (window as any).formsapp !== 'function') return
+      new (window as any).formsapp(
+        FORMS_APP_ID,
+        'standard',
+        {
+          width: '100%',
+          height: '500px',
+          opacity: 0,
+          answers: { [WALLET_FIELD_ID]: activeAddressRef.current ?? '' },
+        },
+        FORMS_APP_BASE_URL
+      )
+      formInitializedRef.current = true
+    })
+  }, [])
 
-    const run = async () => {
-      try {
-        // Check if user already has CARE tokens
-        const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
-        const info = await algod.accountInformation(activeAddress).do() as {
-          assets?: { assetId: bigint; amount: bigint }[]
-        }
-        const careAsset = (info.assets ?? []).find((a) => Number(a.assetId) === ASSET_ID)
-        const careBalance = careAsset ? Number(careAsset.amount) : 0
-        console.log('CARE balance:', careBalance)
-
-        if (careBalance > 0) {
-          // Already has tokens — skip send
-          console.log('Already has CARE tokens, skipping send-care')
-          setCareSent(true)
-          return
-        }
-
-        // Send welcome bonus
-        const res = await fetch('/api/send-care', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address: activeAddress, amount: 10 }),
-        })
-        const data = await res.json()
-        console.log('send-care:', res.status, data)
-        setCareSent(true)
-      } catch (err) {
-        console.error('send-care error:', err)
-        setError('Welcome bonus konnte nicht gesendet werden.')
-        setCareSent(true)
-      }
+  const handleOptIn = async () => {
+    const address = activeAddressRef.current
+    if (!address) return
+    setOptInLoading(true)
+    setOptInError(null)
+    try {
+      const suggestedParams = await algodClient.getTransactionParams().do()
+      const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+        sender: address,
+        receiver: address,
+        amount: 0,
+        assetIndex: CARE_ASSET_ID,
+        suggestedParams,
+      } as any)
+      const encodedTxn = algosdk.encodeUnsignedTransaction(txn)
+      const signedTxns = await signTransactions([encodedTxn])
+      const validTxns = signedTxns.filter((t): t is Uint8Array => t !== null)
+      if (validTxns.length === 0) throw new Error('Wallet signing cancelled')
+      await algodClient.sendRawTransaction(validTxns).do()
+      await algosdk.waitForConfirmation(algodClient, txn.txID().toString(), 4)
+      setLocalOptedIn(true)
+      refetch()
+    } catch (e: unknown) {
+      console.error('Opt-in error:', e)
+      setOptInError('Opt-in fehlgeschlagen. Bitte prüfe dein Wallet und versuche es erneut.')
+    } finally {
+      setOptInLoading(false)
     }
-
-    run()
-  }, [activeAddress])
+  }
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-        Welcome to Care Coin
-      </h1>
-      <p style={{ marginBottom: '0.5rem', color: '#555' }}>This is a research pilot.</p>
-      <p style={{ marginBottom: '2rem', color: '#555' }}>Your care work matters — and we want to recognise it.</p>
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 py-10 px-4">
+      <div className="max-w-2xl mx-auto space-y-6">
 
-      {!careSent && (
-        <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', marginBottom: '1rem' }}>
-          <strong>⏳ Setting up your account…</strong>
-        </div>
-      )}
-
-      {careSent && (
-        <div>
-          <div style={{ background: '#e5f8fc', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
-            <strong>Care Coin enabled ✅</strong>
-            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1333fa', marginTop: 4 }}>
-              You are all set. Please fill in the form below so we can send you Care Coins.
-            </p>
-          </div>
-
-          {error && (
-            <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '1rem' }}>{error}</p>
-          )}
-
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '0.25rem' }}>
-            Tell us about your care work
-          </h2>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginBottom: '1rem' }}>
-            Your answers help us understand how to value care better.
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-bold text-teal-800">Welcome to Care Coin</h1>
+          <p className="text-gray-500 text-sm">
+            This is a research pilot. Your care work matters — and we want to recognise it.
           </p>
-
-          <iframe
-            src="https://join-project-care-coin.forms.app/onboarding"
-            width="100%"
-            height="600"
-            style={{ border: 'none', borderRadius: 12 }}
-            title="Care Work Survey"
-          />
         </div>
-      )}
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="flex items-center gap-3">
+            <span className="w-3 h-3 rounded-full bg-green-400 inline-block" />
+            <div>
+              <p className="text-sm font-medium text-gray-700">Wallet connected</p>
+              <p className="text-xs text-gray-400 font-mono truncate max-w-xs">{activeAddress}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Welcome Fund Status */}
+        {fundingStatus === 'checking' && (
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-3">
+            <span className="w-3 h-3 rounded-full bg-blue-400 animate-pulse inline-block" />
+            <p className="text-sm text-blue-700">Preparing your wallet…</p>
+          </div>
+        )}
+        {fundingStatus === 'funded' && (
+          <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center gap-3">
+            <span className="text-sky-500 text-lg">✓</span>
+            <div>
+              <p className="text-sm font-medium text-sky-800">Welcome fund received</p>
+              <p className="text-xs text-sky-600">1 ALGO has been sent to your wallet to get you started.</p>
+            </div>
+          </div>
+        )}
+
+        {!isOptedIn && (
+          <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 space-y-4">
+            <div className="space-y-1">
+              <h2 className="font-semibold text-gray-800">Enable Care Coin</h2>
+              <p className="text-sm text-gray-500">
+                One quick wallet step so we can send you Care Coins.
+              </p>
+              <p className="text-xs text-gray-400">
+                ⓘ Your wallet needs a tiny ALGO reserve for this.
+              </p>
+            </div>
+            {optInError && (
+              <p className="text-sm text-red-500 bg-red-50 rounded-xl p-3">{optInError}</p>
+            )}
+            {status === 'loading' && !localOptedIn ? (
+              <p className="text-sm text-gray-400 animate-pulse">Checking wallet…</p>
+            ) : (
+              <button
+                onClick={handleOptIn}
+                disabled={optInLoading || fundingStatus === 'checking'}
+                className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white font-medium py-3 rounded-xl transition-all"
+              >
+                {optInLoading ? 'Confirming in wallet…' : 'Enable Care Coin →'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {isOptedIn && (
+          <>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3">
+              <span className="text-emerald-500 text-lg">✓</span>
+              <div>
+                <p className="text-sm font-medium text-emerald-800">Care Coin enabled</p>
+                <p className="text-xs text-emerald-600">
+                  You are all set. Please fill in the form below so we can send you Care Coins.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+              <div className="px-5 py-4 border-b border-gray-100">
+                <h2 className="font-semibold text-gray-800">Tell us about your care work</h2>
+                <p className="text-xs text-gray-400">
+                  Your answers help us understand how to value care better.
+                </p>
+              </div>
+              <div ref={initForm} className="min-h-[200px]" />
+            </div>
+          </>
+        )}
+
+      </div>
     </div>
   )
 }
