@@ -178,6 +178,22 @@ export default function Redeem() {
               Add <code>VITE_CARE_COIN_ASSET_ID</code> + <code>VITE_PROJECT_WALLET_ADDRESS</code> to enable real token transfers.
             </div>
           )}
+                    {!isRealMode && (
+            <div className="rounded-2xl border border-[#fb9b0c]/20 bg-[#fb9b0c]/5 p-4 text-xs text-[#fb9b0c]">
+              ⚙️ Simulation mode — your preference is recorded as a blockchain note.
+              Add <code>VITE_CARE_COIN_ASSET_ID</code> + <code>VITE_PROJECT_WALLET_ADDRESS</code> to enable real token transfers.
+            </div>
+          )}
+
+          <p className="text-xs text-white/45 -mt-4">
+            If the log-in appears again, reconnect and continue
+          </p>
+
+          {status === 'error' && (
+            <div className="rounded-2xl border border-[#fa1179]/30 bg-[#fa1179]/10 p-4 text-sm text-[#fa1179]">
+              {errorMsg}
+            </div>
+          )}
           {status === 'error' && (
             <div className="rounded-2xl border border-[#fa1179]/30 bg-[#fa1179]/10 p-4 text-sm text-[#fa1179]">
               {errorMsg}
