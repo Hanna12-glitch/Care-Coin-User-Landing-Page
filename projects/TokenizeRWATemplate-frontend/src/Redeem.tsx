@@ -18,7 +18,7 @@ const REWARD_CATEGORIES = [
 type Status = 'idle' | 'signing' | 'submitting' | 'success' | 'error'
 
 export default function Redeem() {
-  const { activeAddress, transactionSigner, isReady } = useWallet()
+  const { activeAddress, signTransactions, isReady } = useWallet()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -49,10 +49,12 @@ export default function Redeem() {
     if (!selected) return
     setStatus('signing')
     setErrorMsg('')
+
     try {
       const config = getAlgodConfigFromViteEnvironment()
       const algod = new algosdk.Algodv2(String(config.token), config.server, config.port)
       const suggestedParams = await algod.getTransactionParams().do()
+
       const redeemData = {
         type: 'care-redeem',
         reward: selected,
@@ -60,7 +62,9 @@ export default function Redeem() {
         timestamp: new Date().toISOString(),
         version: 1,
       }
+
       let txn: algosdk.Transaction
+
       if (isRealMode) {
         txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
           sender: activeAddress,
@@ -79,9 +83,12 @@ export default function Redeem() {
           suggestedParams,
         })
       }
+
       setStatus('submitting')
-      const signedTxns = await transactionSigner([txn], [0])
-      await algod.sendRawTransaction(signedTxns[0]).do()
+      const encodedTxn = algosdk.encodeUnsignedTransaction(txn)
+      const signedTxns = await signTransactions([encodedTxn])
+      const validTxns = signedTxns.filter((t): t is Uint8Array => t !== null)
+      await algod.sendRawTransaction(validTxns[0]).do()
       await algosdk.waitForConfirmation(algod, txn.txID().toString(), 4)
       setTxId(txn.txID().toString())
       setStatus('success')
@@ -134,11 +141,13 @@ export default function Redeem() {
         <Link to="/dashboard" className="text-white/40 hover:text-white text-sm font-medium transition mb-8 inline-block">
           ← Back to Dashboard
         </Link>
+
         <p className="text-xs font-bold uppercase tracking-widest text-[#1333fa] mb-2">Redeem</p>
         <h1 className="text-3xl font-extrabold text-white mb-2">Choose your reward</h1>
         <p className="text-white/50 mb-10">
           What would you most like for your care work? Your choice helps us find the right partners.
         </p>
+
         <form onSubmit={handleRedeem} className="space-y-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {REWARD_CATEGORIES.map(reward => (
@@ -157,6 +166,7 @@ export default function Redeem() {
               </button>
             ))}
           </div>
+
           {selected === 'other' && (
             <div>
               <label className="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wider">
@@ -172,13 +182,8 @@ export default function Redeem() {
               />
             </div>
           )}
+
           {!isRealMode && (
-            <div className="rounded-2xl border border-[#fb9b0c]/20 bg-[#fb9b0c]/5 p-4 text-xs text-[#fb9b0c]">
-              ⚙️ Simulation mode — your preference is recorded as a blockchain note.
-              Add <code>VITE_CARE_COIN_ASSET_ID</code> + <code>VITE_PROJECT_WALLET_ADDRESS</code> to enable real token transfers.
-            </div>
-          )}
-                    {!isRealMode && (
             <div className="rounded-2xl border border-[#fb9b0c]/20 bg-[#fb9b0c]/5 p-4 text-xs text-[#fb9b0c]">
               ⚙️ Simulation mode — your preference is recorded as a blockchain note.
               Add <code>VITE_CARE_COIN_ASSET_ID</code> + <code>VITE_PROJECT_WALLET_ADDRESS</code> to enable real token transfers.
@@ -194,18 +199,24 @@ export default function Redeem() {
               {errorMsg}
             </div>
           )}
-          {status === 'error' && (
-            <div className="rounded-2xl border border-[#fa1179]/30 bg-[#fa1179]/10 p-4 text-sm text-[#fa1179]">
-              {errorMsg}
-            </div>
-          )}
+
           <button
             type="submit"
             disabled={!selected || (selected === 'other' && !customIdea.trim()) || status === 'signing' || status === 'submitting'}
             className="w-full py-4 rounded-2xl font-extrabold text-lg bg-[#1333fa] text-white hover:bg-[#fa1179] hover:scale-[1.01] transition disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {status === 'signing' && (<><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Check your wallet...</>)}
-            {status === 'submitting' && (<><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Recording on-chain...</>)}
+            {status === 'signing' && (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Check your wallet...
+              </>
+            )}
+            {status === 'submitting' && (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Recording on-chain...
+              </>
+            )}
             {(status === 'idle' || status === 'error') && '✦ Redeem my care coins'}
           </button>
         </form>
