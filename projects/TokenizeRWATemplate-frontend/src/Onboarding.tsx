@@ -23,7 +23,7 @@ function loadFormsScript(callback: () => void) {
 
 export default function Onboarding() {
   const navigate = useNavigate()
-  const { activeAddress, signTransactions } = useWallet()
+  const { activeAddress, signTransactions, isReady } = useWallet()
   const { status, refetch, algodClient } = useCareCoinOptIn(activeAddress)
 
   const [localOptedIn, setLocalOptedIn] = useState(false)
@@ -37,12 +37,11 @@ export default function Onboarding() {
 
   const isOptedIn = localOptedIn || status === 'opted-in'
 
-  // Logout-Redirect
   useEffect(() => {
+    if (!isReady) return
     if (!activeAddress) navigate('/')
-  }, [activeAddress, navigate])
+  }, [activeAddress, isReady, navigate])
 
-  // Welcome Fund
   useEffect(() => {
     if (!activeAddress || fundingStatus !== 'idle') return
     const checkAndFund = async () => {
@@ -62,7 +61,6 @@ export default function Onboarding() {
     checkAndFund()
   }, [activeAddress, fundingStatus])
 
-  // On-chain CARE balance check → Dashboard wenn bereits Coins vorhanden
   useEffect(() => {
     if (!activeAddress) return
     if (status === 'loading') return
@@ -85,41 +83,20 @@ export default function Onboarding() {
     checkBalance()
   }, [activeAddress, status, navigate])
 
-  // forms.app postMessage → /thank-you
   useEffect(() => {
-  const handleMessage = async (event: MessageEvent) => {
-    console.log('ALL messages:', event.origin, JSON.stringify(event.data))
-    if (event.origin.includes('forms.app')) {
-      console.log('forms.app message:', event.data)
-    }
-    if (
-      typeof event.data === 'object' &&
-      event.data?.type === 'formsapp' &&
-      event.data?.action === 'submitted'
-    ) {
-      // CARE Coins senden nach Form-Submit
-      try {
-        const res = await fetch('/api/send-care', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            address: activeAddressRef.current,
-            amount: 10,  // ← Anzahl CARE Coins anpassen
-          }),
-        })
-        const data = await res.json()
-        console.log('send-care result:', data)
-      } catch (e) {
-        console.error('send-care failed:', e)
+    const handleMessage = async (event: MessageEvent) => {
+      if (
+        typeof event.data === 'object' &&
+        event.data?.type === 'formsapp' &&
+        event.data?.action === 'submitted'
+      ) {
+        navigate('/thank-you')
       }
-      navigate('/thank-you')
     }
-  }
-  window.addEventListener('message', handleMessage)
-  return () => window.removeEventListener('message', handleMessage)
-}, [activeAddress, navigate])
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [navigate])
 
-  // forms.app Callback-Ref
   const initForm = useCallback((node: HTMLDivElement | null) => {
     if (!node || formInitializedRef.current) return
     node.setAttribute('formsappId', FORMS_APP_ID)
@@ -171,6 +148,14 @@ export default function Onboarding() {
     }
   }
 
+  if (!isReady) return (
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center">
+      <span className="w-4 h-4 border-2 border-teal-300 border-t-teal-600 rounded-full animate-spin" />
+    </div>
+  )
+
+  if (!activeAddress) return null
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 py-10 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
@@ -198,7 +183,6 @@ export default function Onboarding() {
             <p className="text-sm text-blue-700">Preparing your wallet…</p>
           </div>
         )}
-        
 
         {!isOptedIn && (
           <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 space-y-4">
