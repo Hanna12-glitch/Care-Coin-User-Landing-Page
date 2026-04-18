@@ -87,21 +87,36 @@ export default function Onboarding() {
 
   // forms.app postMessage → /thank-you
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin.includes('forms.app')) {
-        console.log('forms.app message:', event.data)
-      }
-      if (
-        typeof event.data === 'object' &&
-        event.data?.type === 'formsapp' &&
-        event.data?.action === 'submitted'
-      ) {
-        navigate('/thank-you')
-      }
+  const handleMessage = async (event: MessageEvent) => {
+    if (event.origin.includes('forms.app')) {
+      console.log('forms.app message:', event.data)
     }
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
-  }, [activeAddress, navigate])
+    if (
+      typeof event.data === 'object' &&
+      event.data?.type === 'formsapp' &&
+      event.data?.action === 'submitted'
+    ) {
+      // CARE Coins senden nach Form-Submit
+      try {
+        const res = await fetch('/api/send-care', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            address: activeAddressRef.current,
+            amount: 10,  // ← Anzahl CARE Coins anpassen
+          }),
+        })
+        const data = await res.json()
+        console.log('send-care result:', data)
+      } catch (e) {
+        console.error('send-care failed:', e)
+      }
+      navigate('/thank-you')
+    }
+  }
+  window.addEventListener('message', handleMessage)
+  return () => window.removeEventListener('message', handleMessage)
+}, [activeAddress, navigate])
 
   // forms.app Callback-Ref
   const initForm = useCallback((node: HTMLDivElement | null) => {

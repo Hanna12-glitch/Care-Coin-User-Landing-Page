@@ -4,7 +4,8 @@ import algosdk from 'algosdk'
 const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ALGOD_PORT = 443
 const ALGOD_TOKEN = ''
-const ASSET_ID = Number(process.env.VITE_CARE_COIN_ASSET_ID)
+// Zeile 6 ersetzen:
+const ASSET_ID = Number(process.env.CARE_COIN_ASSET_ID) || 758800978
 const MAX_SEND_AMOUNT = 1000 // Sicherheitslimit pro Request
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
