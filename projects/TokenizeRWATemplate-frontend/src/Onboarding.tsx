@@ -8,6 +8,7 @@ const CARE_ASSET_ID = Number((import.meta as any).env.VITE_CARE_COIN_ASSET_ID)
 const FORMS_APP_ID = '69de0aa001324e32c38f6893'
 const FORMS_APP_BASE_URL = 'https://6h6u8bjv.forms.app'
 const WALLET_FIELD_ID = '69de108c8ca500adbd32ae02'
+const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 
 function loadFormsScript(callback: () => void) {
   const existing = document.querySelector('script[src="https://forms.app/cdn/embed.js"]')
@@ -41,7 +42,7 @@ export default function Onboarding() {
     if (!activeAddress) navigate('/')
   }, [activeAddress, navigate])
 
-  // Welcome Fund: Balance prüfen und ggf. ALGO senden
+  // Welcome Fund
   useEffect(() => {
     if (!activeAddress || fundingStatus !== 'idle') return
     const checkAndFund = async () => {
@@ -55,21 +56,34 @@ export default function Onboarding() {
         const data = await res.json()
         setFundingStatus(data.funded ? 'funded' : 'skipped')
       } catch {
-        setFundingStatus('skipped') // In Codespaces: 404 → still ignorieren
+        setFundingStatus('skipped')
       }
     }
     checkAndFund()
   }, [activeAddress, fundingStatus])
 
-  // Wenn User schon submitted hat → direkt zum Dashboard
+  // On-chain CARE balance check → Dashboard wenn bereits Coins vorhanden
   useEffect(() => {
     if (!activeAddress) return
     if (status === 'loading') return
-    const alreadySubmitted = localStorage.getItem(`care-submitted-${activeAddress}`)
-    if (alreadySubmitted && isOptedIn) {
-      navigate('/dashboard')
+    const checkBalance = async () => {
+      try {
+        const algod = new algosdk.Algodv2('', ALGOD_SERVER, 443)
+        const info = await algod.accountInformation(activeAddress).do() as {
+          assets?: { assetId: bigint; amount: bigint }[]
+        }
+        const careAsset = (info.assets ?? []).find((a) => Number(a.assetId) === CARE_ASSET_ID)
+        const careBalance = careAsset ? Number(careAsset.amount) : 0
+        console.log('CARE balance in Onboarding:', careBalance)
+        if (careBalance > 0) {
+          navigate('/dashboard')
+        }
+      } catch (e) {
+        console.error('Balance check failed:', e)
+      }
     }
-  }, [activeAddress, status, isOptedIn, navigate])
+    checkBalance()
+  }, [activeAddress, status, navigate])
 
   // forms.app postMessage → /thank-you
   useEffect(() => {
@@ -82,9 +96,6 @@ export default function Onboarding() {
         event.data?.type === 'formsapp' &&
         event.data?.action === 'submitted'
       ) {
-        if (activeAddress) {
-          localStorage.setItem(`care-submitted-${activeAddress}`, 'true')
-        }
         navigate('/thank-you')
       }
     }
@@ -165,7 +176,6 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* Welcome Fund Status */}
         {fundingStatus === 'checking' && (
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-3">
             <span className="w-3 h-3 rounded-full bg-blue-400 animate-pulse inline-block" />
