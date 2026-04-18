@@ -37,32 +37,34 @@ function buildSupportedWallets(): SupportedWallet[] {
       options: {
         clientId: web3AuthClientId,
         web3AuthNetwork: 'sapphire_devnet',
-        uiConfig: { appName: 'Project Care Coin', mode: 'auto', theme: {
-        primary: '#ffd3e7',      // Button-Farbe
-        onPrimary: '#ffffff',    // Text auf Button
-        }, 
-      },
-        
+        uiConfig: {
+          appName: 'Project Care Coin',
+          mode: 'auto',
+          theme: {
+            primary: '#ffd3e7',
+            onPrimary: '#ffffff',
+          },
+        },
         modalConfig: {
           auth: {
             label: 'auth',
             loginMethods: {
-              google:             { name: 'google',             showOnModal: false },
-              facebook:           { name: 'facebook',           showOnModal: false },
-              reddit:             { name: 'reddit',             showOnModal: false },
-              discord:            { name: 'discord',            showOnModal: false },
-              twitter:            { name: 'twitter',            showOnModal: false },
-              apple:              { name: 'apple',              showOnModal: false },
-              line:               { name: 'line',               showOnModal: false },
-              github:             { name: 'github',             showOnModal: false },
-              kakao:              { name: 'kakao',              showOnModal: false },
-              linkedin:           { name: 'linkedin',           showOnModal: false },
-              twitch:             { name: 'twitch',             showOnModal: false },
-              weibo:              { name: 'weibo',              showOnModal: false },
-              wechat:             { name: 'wechat',             showOnModal: false },
-              farcaster:          { name: 'farcaster',          showOnModal: false },
-              sms_passwordless:   { name: 'sms_passwordless',   showOnModal: false },
-              email_passwordless: { name: 'email_passwordless', showOnModal: true  },
+              google: { name: 'google', showOnModal: false },
+              facebook: { name: 'facebook', showOnModal: false },
+              reddit: { name: 'reddit', showOnModal: false },
+              discord: { name: 'discord', showOnModal: false },
+              twitter: { name: 'twitter', showOnModal: false },
+              apple: { name: 'apple', showOnModal: false },
+              line: { name: 'line', showOnModal: false },
+              github: { name: 'github', showOnModal: false },
+              kakao: { name: 'kakao', showOnModal: false },
+              linkedin: { name: 'linkedin', showOnModal: false },
+              twitch: { name: 'twitch', showOnModal: false },
+              weibo: { name: 'weibo', showOnModal: false },
+              wechat: { name: 'wechat', showOnModal: false },
+              farcaster: { name: 'farcaster', showOnModal: false },
+              sms_passwordless: { name: 'sms_passwordless', showOnModal: false },
+              email_passwordless: { name: 'email_passwordless', showOnModal: true },
             },
           },
         },
@@ -74,8 +76,9 @@ function buildSupportedWallets(): SupportedWallet[] {
 }
 
 export default function App() {
-  const algodConfig = getAlgodConfigFromViteEnvironment()
+  const algodConfig = useMemo(() => getAlgodConfigFromViteEnvironment(), [])
   const supportedWallets = useMemo(() => buildSupportedWallets(), [])
+
   const walletManager = useMemo(() => {
     return new WalletManager({
       wallets: supportedWallets,
@@ -91,7 +94,7 @@ export default function App() {
       },
       options: { resetNetwork: true },
     })
-  }, [algodConfig.network, algodConfig.server, algodConfig.port, algodConfig.token, supportedWallets])
+  }, [algodConfig, supportedWallets])
 
   return (
     <SnackbarProvider maxSnack={3}>
