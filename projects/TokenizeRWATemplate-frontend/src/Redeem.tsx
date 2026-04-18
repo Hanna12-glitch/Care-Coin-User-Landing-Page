@@ -79,13 +79,11 @@ export default function Redeem() {
         })
       }
 
-      const atc = new algosdk.AtomicTransactionComposer()
-      atc.addTransaction({ txn, signer: transactionSigner })
-
-      setStatus('submitting')
-      const result = await atc.execute(algod, 4)
-
-      setTxId(result.txIDs[0])
+     setStatus('submitting')
+      const signedTxns = await transactionSigner([txn], [0])
+      await algod.sendRawTransaction(signedTxns[0]).do()
+      const confirmation = await algosdk.waitForConfirmation(algod, txn.txID().toString(), 4)
+      setTxId(txn.txID().toString())
       setStatus('success')
     } catch (e: unknown) {
       console.error('[Redeem] Error:', e)
