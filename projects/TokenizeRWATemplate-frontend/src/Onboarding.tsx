@@ -182,15 +182,7 @@ export default function Onboarding() {
             <p className="text-sm text-blue-700">Preparing your wallet…</p>
           </div>
         )}
-        {fundingStatus === 'funded' && (
-          <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center gap-3">
-            <span className="text-sky-500 text-lg">✓</span>
-            <div>
-              <p className="text-sm font-medium text-sky-800">Welcome fund received</p>
-              <p className="text-xs text-sky-600">1 ALGO has been sent to your wallet to get you started.</p>
-            </div>
-          </div>
-        )}
+        
 
         {!isOptedIn && (
           <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 space-y-4">
