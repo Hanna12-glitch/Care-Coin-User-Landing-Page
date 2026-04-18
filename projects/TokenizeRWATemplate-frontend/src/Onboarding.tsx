@@ -88,6 +88,7 @@ export default function Onboarding() {
   // forms.app postMessage → /thank-you
   useEffect(() => {
   const handleMessage = async (event: MessageEvent) => {
+    console.log('ALL messages:', event.origin, JSON.stringify(event.data))
     if (event.origin.includes('forms.app')) {
       console.log('forms.app message:', event.data)
     }
