@@ -30,7 +30,7 @@ export default function Dashboard() {
         const algo = Number(acct.amount) / 1_000_000
         let care: number | null = null
         if (assetId) {
-          const holding = (acct.assets ?? []).find((a: any) => a['asset-id'] === assetId)
+          const holding = (acct.assets ?? []).find((a: any) => Number(a.assetId) === assetId)
           care = holding ? Number(holding.amount) : 0
         }
         setInfo({ algoBalance: algo, careBalance: care })
