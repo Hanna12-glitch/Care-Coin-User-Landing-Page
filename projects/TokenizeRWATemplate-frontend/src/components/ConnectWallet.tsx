@@ -3,17 +3,21 @@ import { useMemo, useState } from 'react'
 import { ellipseAddress } from '../utils/ellipseAddress'
 import { getAlgodConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
+
 interface ConnectWalletProps {
   openModal: boolean
   closeModal: () => void
 }
 
+
 const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
   const { wallets, activeWallet, activeAddress } = useWallet()
+
 
   const [connectingKey, setConnectingKey] = useState<string | null>(null)
   const [lastError, setLastError] = useState<string>('')
   const [copied, setCopied] = useState(false)
+
 
   const algoConfig = getAlgodConfigFromViteEnvironment()
   const networkName = useMemo(() => {
@@ -21,16 +25,21 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
     return n === '' ? 'localnet' : n.toLowerCase()
   }, [algoConfig.network])
 
+
   const visibleWallets = useMemo(() => (wallets ?? []).filter(Boolean), [wallets])
 
+
   const connected = Boolean(activeAddress)
+
 
   const web3AuthWallet = visibleWallets.find((w) => w.id === WalletId.WEB3AUTH)
   const traditionalWallets = visibleWallets.filter((w) => w.id !== WalletId.WEB3AUTH)
 
+
   const connectWallet = async (wallet: any) => {
     setLastError('')
     setConnectingKey(wallet.id)
+
 
     try {
       if (typeof wallet.connect !== 'function') {
@@ -51,24 +60,31 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
     }
   }
 
+
   const handleLogout = async () => {
     setLastError('')
-    closeModal()  // ← zuerst Modal schließen
+    closeModal()
+
 
     try {
       if (activeWallet && typeof activeWallet.disconnect === 'function') {
         await activeWallet.disconnect()
+        window.location.href = '/'  // redirect after successful disconnect
       }
     } catch (e: unknown) {
       console.error('[ConnectWallet] Logout failed', e)
+      window.location.href = '/'  // redirect even on error
     } finally {
       setConnectingKey(null)
     }
   }
 
+
   if (!openModal) return null
 
+
   const isConnectingAny = Boolean(connectingKey)
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={closeModal}>
@@ -88,12 +104,14 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
           </button>
         </div>
 
+
         {/* Error display */}
         {lastError && (
           <div className="mb-4 rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-3 text-sm text-red-700 dark:text-red-400">
             {lastError}
           </div>
         )}
+
 
         {/* Connected state */}
         {connected ? (
@@ -106,6 +124,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
                   <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Active</span>
                 </div>
               </div>
+
 
               {/* Address with copy */}
               <div className="flex items-center gap-2 mb-3">
@@ -130,6 +149,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
                 </button>
               </div>
 
+
               {/* Full address */}
               <details className="mb-3">
                 <summary className="text-xs text-slate-500 dark:text-slate-400 cursor-pointer hover:text-slate-700 dark:hover:text-slate-300">
@@ -139,6 +159,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
                   {activeAddress}
                 </div>
               </details>
+
 
               {/* Wallet + Network + Lora */}
               <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
@@ -165,6 +186,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
                 </div>
               </div>
             </div>
+
 
             <button
               onClick={handleLogout}
@@ -196,6 +218,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
               </div>
             )}
 
+
             {web3AuthWallet && traditionalWallets.length > 0 && (
               <div className="flex items-center gap-3 my-4">
                 <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
@@ -203,6 +226,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
                 <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
               </div>
             )}
+
 
             {traditionalWallets.length > 0 && (
               <div className="space-y-2">
@@ -231,6 +255,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
               </div>
             )}
 
+
             {!web3AuthWallet && (
               <div className="mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                 <p className="text-xs text-amber-700 dark:text-amber-400">
@@ -244,5 +269,6 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletProps) => {
     </div>
   )
 }
+
 
 export default ConnectWallet
