@@ -81,7 +81,13 @@ export default function Dashboard() {
         body: JSON.stringify({ address: activeAddress, amount: 30 }),
       })
       const data = await res.json()
-      if (!res.ok || !data.success) throw new Error(data.error ?? 'Claim failed')
+      if (!res.ok || !data.success) {
+        const raw = data.error ?? ''
+        const friendly = raw.includes('underflow')
+    ? 'Not enough Care-Coins. Thank You for your engagement - we will get in touch.'
+    : raw || 'Claim failed. Please try again.'
+    throw new Error(friendly)
+  }
       setClaimTxId(data.txId)
       setClaimStatus('success')
       setInfo(prev => ({ ...prev, careBalance: (prev.careBalance ?? 0) + 10 }))
@@ -232,7 +238,7 @@ export default function Dashboard() {
               What would you most like for your care work? Your choice helps us find the right partners.
             </p>
             <p className="text-sm text-white/50 mb-6">
-              Every Reward is 2 Care-Coins. Which would you like most?
+              Every Reward is 10 Care-Coins. Which would you like most?
             </p>
             <form onSubmit={handleRedeem} className="space-y-6">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
