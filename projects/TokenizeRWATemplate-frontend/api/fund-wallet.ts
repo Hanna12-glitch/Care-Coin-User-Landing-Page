@@ -31,15 +31,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const algodClient = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, ALGOD_PORT)
 
-    // Balance des Empfängers prüfen
-    const accountInfo = await algodClient.accountInformation(address).do()
-    const currentBalance = Number(accountInfo.amount)
+    // Balance prüfen — neue Accounts existieren noch nicht on-chain und werfen 404
+    let currentBalance = 0
+    try {
+      const accountInfo = await algodClient.accountInformation(address).do()
+      currentBalance = Number(accountInfo.amount)
+    } catch (accountErr: any) {
+      // 404 = Account noch nicht on-chain → Balance bleibt 0 → wird gefundet
+      const is404 =
+        accountErr?.status === 404 ||
+        String(accountErr).includes('404') ||
+        accountErr?.message?.includes('no accounts found')
+      if (!is404) throw accountErr
+    }
 
     if (currentBalance >= MIN_BALANCE_THRESHOLD) {
-      return res.status(200).json({ 
-        funded: false, 
+      return res.status(200).json({
+        funded: false,
         reason: 'Already has sufficient balance',
-        balance: currentBalance 
+        balance: currentBalance,
       })
     }
 
@@ -60,10 +70,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log(`Funded ${address} with 1 ALGO. TxID: ${txn.txID()}`)
 
-    return res.status(200).json({ 
-      funded: true, 
+    return res.status(200).json({
+      funded: true,
       txId: txn.txID().toString(),
-      amount: FUND_AMOUNT_ALGO
+      amount: FUND_AMOUNT_ALGO,
     })
 
   } catch (err) {
