@@ -3,13 +3,14 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export default function Home() {
-  const { activeAddress, wallets } = useWallet()
+  const { activeAddress, wallets, isReady } = useWallet()
   const web3authWallet = wallets?.find(w => w.id === 'web3auth')
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (activeAddress) navigate('/onboarding')
-  }, [activeAddress, navigate])
+  if (!isReady) return
+  if (activeAddress) navigate('/onboarding')
+  }, [activeAddress, isReady, navigate])
 
   return (
     <div className="bg-[#ffffff] dark:bg-[#141938]">
