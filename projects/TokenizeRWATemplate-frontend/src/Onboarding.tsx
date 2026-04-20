@@ -1,10 +1,13 @@
 import { useWallet } from '@txnlab/use-wallet-react'
+import algosdk from 'algosdk'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const FORMS_APP_ID = '69de0aa001324e32c38f6893'
 const FORMS_APP_BASE_URL = 'https://6h6u8bjv.forms.app'
 const WALLET_FIELD_ID = '69de108c8ca500adbd32ae02'
+const CARE_ASSET_ID = Number((import.meta as any).env.VITE_CARE_COIN_ASSET_ID)
+const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 
 function loadFormsScript(callback: () => void) {
   const existing = document.querySelector('script[src="https://forms.app/cdn/embed.js"]')
@@ -26,9 +29,29 @@ export default function Onboarding() {
   const activeAddressRef = useRef(activeAddress)
   useEffect(() => { activeAddressRef.current = activeAddress }, [activeAddress])
 
+  
+
+
   useEffect(() => {
-    if (!isReady) return
-    if (!activeAddress) navigate('/')
+  if (!isReady) return
+  if (!activeAddress) { navigate('/'); return }
+
+  // Returning user check — bereits opted-in und hat Care-Coins → Dashboard
+  const checkReturningUser = async () => {
+    try {
+      const algod = new algosdk.Algodv2('', ALGOD_SERVER, '')
+      const info = await algod.accountInformation(activeAddress).do() as {
+        assets?: { assetId: bigint; amount: bigint }[]
+      }
+      const careAsset = (info.assets ?? []).find(a => Number(a.assetId) === CARE_ASSET_ID)
+      if (careAsset && Number(careAsset.amount) > 0) {
+        navigate('/dashboard')
+      }
+    } catch (e) {
+      console.error('Returning user check failed:', e)
+    }
+  }
+  checkReturningUser()
   }, [activeAddress, isReady, navigate])
 
   // Fund wallet on mount

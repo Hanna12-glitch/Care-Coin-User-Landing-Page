@@ -1,8 +1,21 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import algosdk from 'algosdk'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getAlgodConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
+
+const REWARD_CATEGORIES = [
+  { id: 'wellness',  label: 'Wellness Voucher',   desc: 'Massage, spa or yoga' },
+  { id: 'financial', label: 'Financial Coaching', desc: '1:1 with an advisor' },
+  { id: 'shopping',  label: 'Shopping Voucher',   desc: 'Groceries or household' },
+  { id: 'fashion',   label: 'Fashion',            desc: 'Fashion Voucher' },
+  { id: 'education', label: 'Education',          desc: 'Course or workshop' },
+  { id: 'culture',   label: 'Culture & Leisure',  desc: 'Cinema, theatre, museum' },
+  { id: 'health',    label: 'Health Check-Up',    desc: 'Medical or preventive care' },
+  { id: 'other',     label: 'My own idea',        desc: 'Tell us what you want!' },
+]
+
+type RedeemStatus = 'idle' | 'signing' | 'submitting' | 'success' | 'error'
 
 interface AccountInfo {
   algoBalance: number
@@ -10,14 +23,25 @@ interface AccountInfo {
 }
 
 export default function Dashboard() {
-  const { activeAddress, isReady } = useWallet()
+  const { activeAddress, signTransactions, isReady } = useWallet()
   const navigate = useNavigate()
+
   const [info, setInfo] = useState<AccountInfo>({ algoBalance: 0, careBalance: null })
   const [loading, setLoading] = useState(true)
 
   const [claimStatus, setClaimStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [claimError, setClaimError] = useState<string | null>(null)
-  const [txId, setTxId] = useState<string | null>(null)
+  const [claimTxId, setClaimTxId] = useState<string | null>(null)
+
+  const [selected, setSelected] = useState<string | null>(null)
+  const [customIdea, setCustomIdea] = useState('')
+  const [redeemStatus, setRedeemStatus] = useState<RedeemStatus>('idle')
+  const [redeemTxId, setRedeemTxId] = useState('')
+  const [redeemError, setRedeemError] = useState('')
+
+  const assetId = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID ?? 0)
+  const projectWallet = (import.meta.env.VITE_PROJECT_WALLET_ADDRESS ?? '').trim()
+  const isRealMode = Boolean(assetId && projectWallet)
 
   useEffect(() => {
     if (!isReady) return
@@ -28,7 +52,6 @@ export default function Dashboard() {
     if (!activeAddress) return
     const config = getAlgodConfigFromViteEnvironment()
     const algod = new algosdk.Algodv2(String(config.token), config.server, config.port)
-    const assetId = Number(import.meta.env.VITE_CARE_COIN_ASSET_ID ?? 0)
 
     algod.accountInformation(activeAddress).do()
       .then((acct: any) => {
@@ -59,13 +82,61 @@ export default function Dashboard() {
       })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.error ?? 'Claim failed')
-      setTxId(data.txId)
+      setClaimTxId(data.txId)
       setClaimStatus('success')
-      // Balance nach Claim neu laden
       setInfo(prev => ({ ...prev, careBalance: (prev.careBalance ?? 0) + 10 }))
     } catch (e: unknown) {
       setClaimError(e instanceof Error ? e.message : String(e))
       setClaimStatus('error')
+    }
+  }
+
+  const handleRedeem = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selected) return
+    setRedeemStatus('signing')
+    setRedeemError('')
+    try {
+      const config = getAlgodConfigFromViteEnvironment()
+      const algod = new algosdk.Algodv2(String(config.token), config.server, config.port)
+      const suggestedParams = await algod.getTransactionParams().do()
+      const redeemData = {
+        type: 'care-redeem',
+        reward: selected,
+        customIdea: selected === 'other' ? customIdea : undefined,
+        timestamp: new Date().toISOString(),
+        version: 1,
+      }
+      let txn: algosdk.Transaction
+      if (isRealMode) {
+        txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+          sender: activeAddress!,
+          receiver: projectWallet,
+          amount: 1,
+          assetIndex: assetId,
+          note: new TextEncoder().encode(JSON.stringify(redeemData)),
+          suggestedParams,
+        })
+      } else {
+        txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+          sender: activeAddress!,
+          receiver: activeAddress!,
+          amount: 0,
+          note: new TextEncoder().encode(JSON.stringify(redeemData)),
+          suggestedParams,
+        })
+      }
+      setRedeemStatus('submitting')
+      const signedTxns = await signTransactions([txn])
+      const validTxns = signedTxns.filter((t): t is Uint8Array => t !== null)
+      await algod.sendRawTransaction(validTxns[0]).do()
+      await algosdk.waitForConfirmation(algod, txn.txID().toString(), 4)
+      setRedeemTxId(txn.txID().toString())
+      setRedeemStatus('success')
+    } catch (e: unknown) {
+      console.error('[Redeem] Error:', e)
+      setRedeemError(e instanceof Error ? e.message : 'Transaction failed. Please try again.')
+      setRedeemStatus('error')
     }
   }
 
@@ -86,41 +157,24 @@ export default function Dashboard() {
           <h1 className="text-4xl font-extrabold text-white mb-1">Your Care Wallet</h1>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
-
-          {/* CARE Balance */}
-          <div className="rounded-3xl bg-[#1333fa] p-7 shadow-xl">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#ffc2e8] mb-3">CARE Balance</p>
-            {loading ? (
-              <div className="h-12 w-28 bg-white/10 rounded-xl animate-pulse" />
-            ) : (
-              <p className="text-5xl font-extrabold text-white">
-                {info.careBalance !== null ? info.careBalance : '—'}
-              </p>
-            )}
-            <p className="mt-2 text-sm text-white/60">CARE tokens earned</p>
-          </div>
-
-          {/* Redeem */}
-          <Link
-            to="/redeem"
-            className="group rounded-3xl border-2 border-[#1333fa]/30 bg-[#1333fa]/5 hover:bg-[#1333fa]/20 hover:border-[#1333fa]/60 p-7 transition"
-          >
-            <h3 className="text-xl font-extrabold text-white mb-2">Redeem Reward</h3>
-            <p className="text-sm text-white/60 leading-relaxed">
-              Exchange your CARE tokens for a reward of your choice. Help us find the right partners.
+        {/* CARE Balance */}
+        <div className="rounded-3xl bg-[#1333fa] p-7 shadow-xl mb-5">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#ffc2e8] mb-3">CARE Balance</p>
+          {loading ? (
+            <div className="h-12 w-28 bg-white/10 rounded-xl animate-pulse" />
+          ) : (
+            <p className="text-5xl font-extrabold text-white">
+              {info.careBalance !== null ? info.careBalance : '—'}
             </p>
-          </Link>
-
+          )}
+          <p className="mt-2 text-sm text-white/60">CARE tokens earned</p>
         </div>
 
-        {/* Claim Care Coins */}
+        {/* Claim */}
+        {(info.careBalance === 0 || info.careBalance === null) && !loading && (
         <div className="rounded-3xl border border-[#ffc2e8]/20 bg-[#ffc2e8]/5 p-7 mb-5">
           <h3 className="text-lg font-extrabold text-white mb-1">Claim Care Coins</h3>
-          <p className="text-sm text-white/50 mb-5">
-            🌿 You have 10 Care Coins waiting for you.
-          </p>
-
+          <p className="text-sm text-white/50 mb-5">🌿 You have 10 Care Coins waiting for you.</p>
           {claimStatus === 'idle' && (
             <button
               onClick={handleClaim}
@@ -141,14 +195,14 @@ export default function Dashboard() {
                 <span className="text-emerald-400 text-xl">✓</span>
                 <p className="text-sm font-semibold text-emerald-400">10 Care Coins sent!</p>
               </div>
-              {txId && (
+              {claimTxId && (
                 <a
-                  href={`https://lora.algokit.io/testnet/transaction/${txId}`}
+                  href={`https://lora.algokit.io/testnet/transaction/${claimTxId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-[#ffc2e8]/60 hover:text-[#ffc2e8] font-mono break-all block transition"
                 >
-                  View on Lora ↗ {txId.slice(0, 20)}...
+                  View on Lora ↗ {claimTxId.slice(0, 20)}...
                 </a>
               )}
             </div>
@@ -165,6 +219,96 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+        )}
+
+        {/* Redeem */}
+        {redeemStatus !== 'success' ? (
+          <div className="rounded-3xl border border-[#1333fa]/30 bg-[#1333fa]/5 p-7 mb-5">
+            <h3 className="text-lg font-extrabold text-white mb-1">Choose your Reward</h3>
+            <p className="text-sm text-white/50 mb-6">
+              What would you most like for your care work? Your choice helps us find the right partners.
+            </p>
+            <form onSubmit={handleRedeem} className="space-y-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {REWARD_CATEGORIES.map(reward => (
+                  <button
+                    key={reward.id}
+                    type="button"
+                    onClick={() => setSelected(reward.id)}
+                    className={`rounded-2xl border p-4 flex flex-col items-center gap-2 transition text-center ${
+                      selected === reward.id
+                        ? 'border-[#1333fa] bg-[#1333fa]/25 text-white scale-[1.03]'
+                        : 'border-white/10 bg-white/5 text-white/50 hover:border-white/30 hover:text-white'
+                    }`}
+                  >
+                    <span className="text-xs font-semibold leading-tight">{reward.label}</span>
+                    <span className="text-xs text-white/30 leading-tight hidden sm:block">{reward.desc}</span>
+                  </button>
+                ))}
+              </div>
+              {selected === 'other' && (
+                <div>
+                  <label className="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wider">
+                    What would you like? ✨
+                  </label>
+                  <textarea
+                    value={customIdea}
+                    onChange={e => setCustomIdea(e.target.value)}
+                    placeholder="e.g. A voucher for a local restaurant, a house-cleaning service..."
+                    rows={3}
+                    required
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/20 px-5 py-4 text-sm focus:outline-none focus:border-[#1333fa]/50 transition resize-none"
+                  />
+                </div>
+              )}
+              {!isRealMode && (
+                <div className="rounded-2xl border border-[#fb9b0c]/20 bg-[#fb9b0c]/5 p-4 text-xs text-[#fb9b0c]">
+                  ⚙️ Simulation mode — your preference is recorded as a blockchain note.
+                  Add <code>VITE_CARE_COIN_ASSET_ID</code> + <code>VITE_PROJECT_WALLET_ADDRESS</code> to enable real token transfers.
+                </div>
+              )}
+              {redeemStatus === 'error' && (
+                <div className="rounded-2xl border border-[#fa1179]/30 bg-[#fa1179]/10 p-4 text-sm text-[#fa1179]">
+                  {redeemError}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={!selected || (selected === 'other' && !customIdea.trim()) || redeemStatus === 'signing' || redeemStatus === 'submitting'}
+                className="w-full py-4 rounded-2xl font-extrabold text-lg bg-[#1333fa] text-white hover:bg-[#fa1179] hover:scale-[1.01] transition disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {redeemStatus === 'signing' && (<><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Check your wallet...</>)}
+                {redeemStatus === 'submitting' && (<><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Recording on-chain...</>)}
+                {(redeemStatus === 'idle' || redeemStatus === 'error') && '✦ Redeem my care coins'}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/5 p-7 mb-5 text-center">
+            <div className="text-5xl mb-4">🌟</div>
+            <h3 className="text-xl font-extrabold text-white mb-2">Reward redeemed!</h3>
+            <p className="text-white/60 mb-2">
+              You chose: <span className="text-[#ffc2e8] font-bold">
+                {REWARD_CATEGORIES.find(r => r.id === selected)?.label ?? selected}
+              </span>
+            </p>
+            <p className="text-white/40 text-sm mb-4 leading-relaxed">
+              {isRealMode
+                ? 'Your CARE token has been sent back and recorded on-chain.'
+                : 'Your preference is permanently recorded on the blockchain. Thank you! 💛'}
+            </p>
+            {redeemTxId && (
+              <a
+                href={`https://lora.algokit.io/testnet/transaction/${redeemTxId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#ffc2e8]/70 hover:text-[#ffc2e8] font-mono break-all block transition"
+              >
+                View on Lora ↗ {redeemTxId.slice(0, 20)}...
+              </a>
+            )}
+          </div>
+        )}
 
         {!import.meta.env.VITE_CARE_COIN_ASSET_ID && (
           <div className="rounded-2xl border border-[#fb9b0c]/20 bg-[#fb9b0c]/5 p-4 text-xs text-[#fb9b0c]">
