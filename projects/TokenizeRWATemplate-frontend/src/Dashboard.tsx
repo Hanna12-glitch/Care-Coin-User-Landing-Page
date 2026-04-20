@@ -146,7 +146,7 @@ export default function Dashboard() {
   console.error('[Redeem] Error:', e)
   const raw = e instanceof Error ? e.message : String(e)
   const friendly = raw.includes('underflow')
-    ? 'Your wallet needs to be fed. Please contact us. See button below'
+    ? 'Your wallet needs to be reacitvated. Please contact us via HELP button below'
     : 'Transaction failed. Please try again.'
   setRedeemError(friendly)
   setRedeemStatus('error')
@@ -344,7 +344,7 @@ export default function Dashboard() {
         <div className="mt-10 text-center">
           <a
             href="mailto:help@project-care-coin.org"
-            className="inline-block py-3 px-8 rounded-2xl border border-white/20 bg-white/5 hover:bg-[#fa1179] text-white font-bold text-sm transition-all"
+            className="inline-block py-3 px-8 rounded-2xl border border-white/20 bg-blue/5 hover:bg-[#fa1179] text-white font-bold text-sm transition-all"
           >
             contact
           </a>
