@@ -203,7 +203,7 @@ export default function Dashboard() {
         {/* Claim — nur für User, die noch nie geclaimt haben */}
         {info.careBalance === 0 && !hasClaimed && !loading && (
           <div className="rounded-3xl border border-[#ffc2e8]/20 bg-[#ffc2e8]/5 p-7 mb-5">
-            <h3 className="text-lg font-extrabold text-white mb-1">You have 10 Care Coins waiting for you</h3>
+            <h3 className="text-lg font-extrabold text-white mb-1">You have 30 Care Coins waiting for you</h3>
 
             {claimStatus === 'idle' && (
               <button
