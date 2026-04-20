@@ -141,12 +141,16 @@ export default function Dashboard() {
       setRedeemStatus('success')
       // ✅ Update the displayed Care Balance after a successful redeem
       setInfo(prev => ({ ...prev, careBalance: Math.max(0, (prev.careBalance ?? 0) - 1) }))
+   
     } catch (e: unknown) {
-
-      console.error('[Redeem] Error:', e)
-      setRedeemError(e instanceof Error ? e.message : 'Transaction failed. Please try again.')
-      setRedeemStatus('error')
-    }
+  console.error('[Redeem] Error:', e)
+  const raw = e instanceof Error ? e.message : String(e)
+  const friendly = raw.includes('underflow')
+    ? 'Your wallet has insufficient ALGO to pay the transaction fee. Please top up your Testnet wallet.'
+    : 'Transaction failed. Please try again.'
+  setRedeemError(friendly)
+  setRedeemStatus('error')
+}
   }
 
   if (!isReady) return (
