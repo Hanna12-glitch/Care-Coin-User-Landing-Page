@@ -340,6 +340,16 @@ export default function Dashboard() {
           </div>
         )}
 
+              {/* Footer */}
+        <div className="mt-10 text-center">
+          <a
+            href="mailto:help@project-care-coin.org"
+            className="inline-block py-3 px-8 rounded-2xl border border-white/20 bg-white/5 hover:bg-[#fa1179] text-white font-bold text-sm transition-all"
+          >
+            contact
+          </a>
+        </div>
+
       </div>
     </div>
   )
