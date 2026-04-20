@@ -11,7 +11,9 @@ import Redeem from './Redeem'
 import ThankYou from './ThankYou'
 import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
+// ── außerhalb der Komponente ──────────────────────────────────────────────────
 const web3AuthClientId = (import.meta.env.VITE_WEB3AUTH_CLIENT_ID ?? '').trim()
+const algodConfig = getAlgodConfigFromViteEnvironment()
 
 function buildSupportedWallets(): SupportedWallet[] {
   if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
@@ -75,26 +77,24 @@ function buildSupportedWallets(): SupportedWallet[] {
   return wallets
 }
 
-export default function App() {
-  const algodConfig = useMemo(() => getAlgodConfigFromViteEnvironment(), [])
-  const supportedWallets = useMemo(() => buildSupportedWallets(), [])
+const supportedWallets = buildSupportedWallets()
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const walletManager = useMemo(() => {
-    return new WalletManager({
-      wallets: supportedWallets,
-      defaultNetwork: algodConfig.network,
-      networks: {
-        [algodConfig.network]: {
-          algod: {
-            baseServer: algodConfig.server,
-            port: algodConfig.port,
-            token: String(algodConfig.token),
-          },
+export default function App() {
+  const walletManager = useMemo(() => new WalletManager({
+    wallets: supportedWallets,
+    defaultNetwork: algodConfig.network,
+    networks: {
+      [algodConfig.network]: {
+        algod: {
+          baseServer: algodConfig.server,
+          port: algodConfig.port,
+          token: String(algodConfig.token),
         },
       },
-      options: { resetNetwork: true },
-    })
-  }, [algodConfig, supportedWallets])
+    },
+    options: { resetNetwork: true },
+  }), [])
 
   return (
     <SnackbarProvider maxSnack={3}>
