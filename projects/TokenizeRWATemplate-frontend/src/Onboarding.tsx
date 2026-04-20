@@ -124,22 +124,19 @@ export default function Onboarding() {
 
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-[#141938]">Welcome to Care Coin</h1>
-          <p className="text-[#141938] text-sm">
-            This is a research pilot. Your care work matters — and we want to recognise it.
-            You are now the owner of a digital wallet.
+          <h2 className="text-[#141938] text-sm">
+            This is a research pilot. Your care work matters — and we want to recognise it.         
+          </h2>
+          <h2 className="text-[#141938] text-sm">
+            You are now the owner of a digital wallet.     
+          </h2>
+          <h2 className="text-[#141938] text-sm">           
             Please register below with your care status to receive care-coin.
-          </p>
+          </h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center gap-3">
-            <span className="w-3 h-3 rounded-full bg-green-400 inline-block" />
-            <div>
-              <p className="text-sm font-medium text-gray-700">This is your account number</p>
-              <p className="text-xs text-gray-400 font-mono truncate max-w-xs">{activeAddress}</p>
-            </div>
-          </div>
-        </div>
+        
+        
 
         {fundingStatus === 'checking' && (
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-3">
