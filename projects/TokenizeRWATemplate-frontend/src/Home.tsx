@@ -60,23 +60,24 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Stats Strip */}
+     {/* Stats Strip */}
       <div className="bg-[#1333fa] dark:bg-[#1333fa]/80">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">117bn hours</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Germany alone on top of paid jobs</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">311bn hours</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">unpaid care work annually in Europe alone on top of paid jobs</p>
           </div>
           <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Recognition of this work in the economy — Care Coin changes that</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">135M+ people</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">juggle care work and employment simultaneously</p>
           </div>
           <div>
-            <p className="text-4xl font-extrabold text-[#fba30c]">0</p>
-            <p className="mt-1 text-sm text-white/80 font-medium">Recognition of this work in the economy — Care Coin changes that</p>
+            <p className="text-4xl font-extrabold text-[#fba30c]">44% more care</p>
+            <p className="mt-1 text-sm text-white/80 font-medium">is provided by women who earn less and are more likely to burn-out</p>
           </div>
         </div>
       </div>
+
 
       {/* How It Works — 4 Steps: 1 + 2 + 1 */}
       <div className="bg-[#141938]">
