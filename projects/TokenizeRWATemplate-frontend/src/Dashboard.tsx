@@ -133,7 +133,10 @@ export default function Dashboard() {
       await algosdk.waitForConfirmation(algod, txn.txID().toString(), 4)
       setRedeemTxId(txn.txID().toString())
       setRedeemStatus('success')
+      // ✅ Update the displayed Care Balance after a successful redeem
+      setInfo(prev => ({ ...prev, careBalance: Math.max(0, (prev.careBalance ?? 0) - 1) }))
     } catch (e: unknown) {
+      
       console.error('[Redeem] Error:', e)
       setRedeemError(e instanceof Error ? e.message : 'Transaction failed. Please try again.')
       setRedeemStatus('error')
