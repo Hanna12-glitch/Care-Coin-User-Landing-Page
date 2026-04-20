@@ -78,7 +78,7 @@ export default function Dashboard() {
       const res = await fetch('/api/send-care', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: activeAddress, amount: 10 }),
+        body: JSON.stringify({ address: activeAddress, amount: 30 }),
       })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.error ?? 'Claim failed')
@@ -112,7 +112,7 @@ export default function Dashboard() {
         txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
           sender: activeAddress!,
           receiver: projectWallet,
-          amount: 1,
+          amount: 10,
           assetIndex: assetId,
           note: new TextEncoder().encode(JSON.stringify(redeemData)),
           suggestedParams,
@@ -136,7 +136,7 @@ export default function Dashboard() {
       // ✅ Update the displayed Care Balance after a successful redeem
       setInfo(prev => ({ ...prev, careBalance: Math.max(0, (prev.careBalance ?? 0) - 1) }))
     } catch (e: unknown) {
-      
+
       console.error('[Redeem] Error:', e)
       setRedeemError(e instanceof Error ? e.message : 'Transaction failed. Please try again.')
       setRedeemStatus('error')
