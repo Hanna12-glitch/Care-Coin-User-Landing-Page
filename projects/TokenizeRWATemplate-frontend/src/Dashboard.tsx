@@ -167,14 +167,14 @@ export default function Dashboard() {
               {info.careBalance !== null ? info.careBalance : '—'}
             </p>
           )}
-          <p className="mt-2 text-sm text-white/60">CARE tokens earned</p>
+          
         </div>
 
         {/* Claim — nur wenn Balance 0 oder noch nicht geladen */}
         {(info.careBalance === 0 || info.careBalance === null) && !loading && (
           <div className="rounded-3xl border border-[#ffc2e8]/20 bg-[#ffc2e8]/5 p-7 mb-5">
-            <h3 className="text-lg font-extrabold text-white mb-1">Claim Care Coins</h3>
-            <p className="text-sm text-white/50 mb-5">🌿 You have 10 Care Coins waiting for you.</p>
+            <h3 className="text-lg font-extrabold text-white mb-1">You have 10 Care Coins waiting for you</h3>
+            
             {claimStatus === 'idle' && (
               <button
                 onClick={handleClaim}
@@ -228,6 +228,9 @@ export default function Dashboard() {
             <p className="text-sm text-white/50 mb-6">
               What would you most like for your care work? Your choice helps us find the right partners.
             </p>
+            <p className="text-sm text-white/50 mb-6">
+              Every Reward is 2 Care-Coins. Which would you like most?
+            </p>
             <form onSubmit={handleRedeem} className="space-y-6">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {REWARD_CATEGORIES.map(reward => (
@@ -279,24 +282,21 @@ export default function Dashboard() {
               >
                 {redeemStatus === 'signing' && (<><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Check your wallet...</>)}
                 {redeemStatus === 'submitting' && (<><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Recording on-chain...</>)}
-                {(redeemStatus === 'idle' || redeemStatus === 'error') && '✦ Redeem my care coins'}
+                {(redeemStatus === 'idle' || redeemStatus === 'error') && 'Redeem my care coins'}
               </button>
             </form>
           </div>
         ) : (
-          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/5 p-7 mb-5 text-center">
-            <div className="text-5xl mb-4">🌟</div>
-            <h3 className="text-xl font-extrabold text-white mb-2">Reward redeemed!</h3>
+          <div className="rounded-3xl border border-blue-500/30 bg-blue-500/5 p-7 mb-5 text-center">
+            
+            <h3 className="text-xl font-extrabold text-white mb-2">Thank You for submitting your choice!</h3>
+            <h2 className="text-xl font-extrabold text-white mb-2">Your Reward will be send to you via e-mail shortly</h2>
             <p className="text-white/60 mb-2">
               You chose: <span className="text-[#ffc2e8] font-bold">
                 {REWARD_CATEGORIES.find(r => r.id === selected)?.label ?? selected}
               </span>
             </p>
-            <p className="text-white/40 text-sm mb-6 leading-relaxed">
-              {isRealMode
-                ? 'Your CARE token has been sent back and recorded on-chain.'
-                : 'Your preference is permanently recorded on the blockchain. Thank you! 💛'}
-            </p>
+            
             {redeemTxId && (
               <a
                 href={`https://lora.algokit.io/testnet/transaction/${redeemTxId}`}

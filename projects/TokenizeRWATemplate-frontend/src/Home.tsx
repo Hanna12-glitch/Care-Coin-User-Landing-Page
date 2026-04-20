@@ -9,8 +9,11 @@ export default function Home() {
 
   useEffect(() => {
   if (!isReady) return
-  if (activeAddress) navigate('/onboarding')
-  }, [activeAddress, isReady, navigate])
+  if (!activeAddress) return
+  // Returning user mit Balance → Dashboard, neuer User → Onboarding
+  // wird in Onboarding.tsx nochmal geprüft, hier immer zu onboarding
+  navigate('/onboarding', { replace: true })
+}, [activeAddress, isReady, navigate])
 
   return (
     <div className="bg-[#ffffff] dark:bg-[#141938]">

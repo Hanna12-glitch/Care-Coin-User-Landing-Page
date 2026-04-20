@@ -111,21 +111,23 @@ export default function Onboarding() {
   }, [])
 
   if (!isReady) return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center">
-      <span className="w-4 h-4 border-2 border-teal-300 border-t-teal-600 rounded-full animate-spin" />
+    <div className="min-h-screen bg-[#ffffff] flex items-center justify-center">
+      <span className="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
     </div>
   )
 
   if (!activeAddress) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 py-10 px-4">
+    <div className="min-h-screen bg-[#ffffff] py-10 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
 
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-teal-800">Welcome to Care Coin</h1>
-          <p className="text-gray-500 text-sm">
+          <h1 className="text-2xl font-bold text-[#141938]">Welcome to Care Coin</h1>
+          <p className="text-[#141938] text-sm">
             This is a research pilot. Your care work matters — and we want to recognise it.
+            You are now the owner of a digital wallet.
+            Please register below with your care status to receive care-coin.
           </p>
         </div>
 
@@ -133,7 +135,7 @@ export default function Onboarding() {
           <div className="flex items-center gap-3">
             <span className="w-3 h-3 rounded-full bg-green-400 inline-block" />
             <div>
-              <p className="text-sm font-medium text-gray-700">Wallet connected</p>
+              <p className="text-sm font-medium text-gray-700">This is your account number</p>
               <p className="text-xs text-gray-400 font-mono truncate max-w-xs">{activeAddress}</p>
             </div>
           </div>
@@ -150,7 +152,7 @@ export default function Onboarding() {
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-800">Tell us about your care work</h2>
             <p className="text-xs text-gray-400">
-              Your answers help us understand how to value care better.
+              You will receive care-coin according to your care profile.
             </p>
           </div>
           <div ref={initForm} className="min-h-[200px]" />
