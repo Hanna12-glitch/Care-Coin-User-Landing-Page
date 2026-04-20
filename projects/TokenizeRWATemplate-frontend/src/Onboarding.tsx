@@ -34,9 +34,15 @@ export default function Onboarding() {
 
   useEffect(() => {
   if (!isReady) return
-  if (!activeAddress) { navigate('/'); return }
+  if (!activeAddress) {
+    navigate('/')
+  }
+}, [activeAddress, isReady, navigate])
 
-  // Returning user check — bereits opted-in und hat Care-Coins → Dashboard
+useEffect(() => {
+  if (!activeAddress) return
+  if (fundingStatus !== 'funded' && fundingStatus !== 'skipped') return
+
   const checkReturningUser = async () => {
     try {
       const algod = new algosdk.Algodv2('', ALGOD_SERVER, '')
@@ -44,6 +50,7 @@ export default function Onboarding() {
         assets?: { assetId: bigint; amount: bigint }[]
       }
       const careAsset = (info.assets ?? []).find(a => Number(a.assetId) === CARE_ASSET_ID)
+
       if (careAsset && Number(careAsset.amount) > 0) {
         navigate('/dashboard')
       }
@@ -51,28 +58,34 @@ export default function Onboarding() {
       console.error('Returning user check failed:', e)
     }
   }
+
   checkReturningUser()
-  }, [activeAddress, isReady, navigate])
+}, [activeAddress, fundingStatus, navigate])
 
   // Fund wallet on mount
   useEffect(() => {
-    if (!activeAddress || fundingStatus !== 'idle') return
-    const checkAndFund = async () => {
-      setFundingStatus('checking')
-      try {
-        const res = await fetch('/api/fund-wallet', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address: activeAddress }),
-        })
-        const data = await res.json()
-        setFundingStatus(data.funded ? 'funded' : 'skipped')
-      } catch {
-        setFundingStatus('skipped')
-      }
+  if (!activeAddress || fundingStatus !== 'idle') return
+  const checkAndFund = async () => {
+    setFundingStatus('checking')
+    try {
+      const res = await fetch('/api/fund-wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: activeAddress }),
+      })
+      const data = await res.json()
+      
+      // DEBUG: Zeige die echte Response
+      console.log('Fund response:', data)
+      
+      setFundingStatus(data.funded ? 'funded' : 'skipped')
+    } catch (e) {
+      console.error('Fund fetch failed:', e)
+      setFundingStatus('skipped')
     }
-    checkAndFund()
-  }, [activeAddress, fundingStatus])
+  }
+  checkAndFund()
+}, [activeAddress, fundingStatus])
 
   // Listen for form submit → redirect to thank-you
   useEffect(() => {
