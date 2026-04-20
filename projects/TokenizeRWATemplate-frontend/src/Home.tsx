@@ -101,14 +101,14 @@ export default function Home() {
           {/* Row 2 — Steps 2 & 3 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
 
-            {/* Step 2 — Log Your Care Work */}
+            {/* Step 2 — Register your care status. */}
             <div className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-[#ffc2e8]/10 hover:border-[#ffc2e8]/30 p-7 transition">
               <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
                 2
               </div>
               <h3 className="text-lg font-extrabold text-white mb-2">Log Your Care Work</h3>
               <p className="text-sm text-white/60 leading-relaxed">
-                Put in the amount of care work and what type.
+                Tell us about your care work.
               </p>
             </div>
 
@@ -119,7 +119,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-extrabold text-white mb-2">Receive Care Coins</h3>
               <p className="text-sm text-white/60 leading-relaxed">
-                Care Coin will send your care coins to your account. One hour = one care coin.
+                Care Coin will send your care coins to your account.
               </p>
             </div>
 
