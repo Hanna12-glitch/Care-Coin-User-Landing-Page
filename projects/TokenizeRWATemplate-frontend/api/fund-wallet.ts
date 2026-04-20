@@ -4,26 +4,26 @@ import algosdk from 'algosdk'
 const ALGOD_SERVER = 'https://testnet-api.algonode.cloud'
 const ALGOD_PORT = 443
 const ALGOD_TOKEN = ''
-const FUND_AMOUNT_ALGO = 1_000_000 // 1 ALGO in microAlgo
-const MIN_BALANCE_THRESHOLD = 200_000 // 0.2 ALGO — nur funden wenn darunter
+const FUND_AMOUNT_ALGO = 1_000_000
+const MIN_BALANCE_THRESHOLD = 200_000
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS für Codespace + Vercel
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
   if (req.method === 'OPTIONS') return res.status(200).end()
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { address } = req.body
+  const { address } = req.body ?? {}
   if (!address || typeof address !== 'string') {
     return res.status(400).json({ error: 'Missing address' })
   }
 
-  const mnemonic = process.env.TREASURY_MNEMONIC
+  const mnemonic = process.env.TREASURY_MNEMONIC?.trim()
   if (!mnemonic) {
     return res.status(500).json({ error: 'Treasury not configured' })
   }
@@ -31,18 +31,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const algodClient = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, ALGOD_PORT)
 
-    // Balance prüfen — neue Accounts existieren noch nicht on-chain und werfen 404
     let currentBalance = 0
     try {
       const accountInfo = await algodClient.accountInformation(address).do()
-      currentBalance = Number(accountInfo.amount)
+      currentBalance = Number(accountInfo.amount ?? 0)
     } catch (accountErr: any) {
-      // 404 = Account noch nicht on-chain → Balance bleibt 0 → wird gefundet
+      const status = accountErr?.status ?? accountErr?.response?.status
+      const message = String(accountErr?.message ?? accountErr)
+
       const is404 =
-        accountErr?.status === 404 ||
-        String(accountErr).includes('404') ||
-        accountErr?.message?.includes('no accounts found')
-      if (!is404) throw accountErr
+        status === 404 ||
+        message.includes('404') ||
+        message.toLowerCase().includes('not found') ||
+        message.toLowerCase().includes('no accounts found')
+
+      if (!is404) {
+        throw accountErr
+      }
     }
 
     if (currentBalance >= MIN_BALANCE_THRESHOLD) {
@@ -53,7 +58,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     }
 
-    // Treasury-Wallet laden
     const treasuryAccount = algosdk.mnemonicToSecretKey(mnemonic)
     const suggestedParams = await algodClient.getTransactionParams().do()
 
@@ -65,19 +69,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
 
     const signedTxn = txn.signTxn(treasuryAccount.sk)
-    await algodClient.sendRawTransaction(signedTxn).do()
+    const sendResp = await algodClient.sendRawTransaction(signedTxn).do()
     await algosdk.waitForConfirmation(algodClient, txn.txID().toString(), 4)
-
-    console.log(`Funded ${address} with 1 ALGO. TxID: ${txn.txID()}`)
 
     return res.status(200).json({
       funded: true,
       txId: txn.txID().toString(),
+      tx: sendResp,
       amount: FUND_AMOUNT_ALGO,
     })
+  } catch (err: any) {
+    console.error('Fund error:', {
+      message: err?.message,
+      status: err?.status,
+      body: err?.response?.body,
+      stack: err?.stack,
+    })
 
-  } catch (err) {
-    console.error('Fund error:', err)
-    return res.status(500).json({ error: 'Funding failed' })
+    return res.status(500).json({
+      error: 'Funding failed',
+      details: err?.message ?? 'Unknown error',
+    })
   }
 }
