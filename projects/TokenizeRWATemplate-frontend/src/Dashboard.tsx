@@ -140,7 +140,7 @@ export default function Dashboard() {
       setRedeemTxId(txn.txID().toString())
       setRedeemStatus('success')
       // ✅ Update the displayed Care Balance after a successful redeem
-      setInfo(prev => ({ ...prev, careBalance: Math.max(0, (prev.careBalance ?? 0) - 1) }))
+      setInfo(prev => ({ ...prev, careBalance: Math.max(0, (prev.careBalance ?? 0) - 10) }))
    
     } catch (e: unknown) {
   console.error('[Redeem] Error:', e)
