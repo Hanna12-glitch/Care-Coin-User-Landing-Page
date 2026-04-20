@@ -71,31 +71,31 @@ export default function Dashboard() {
   }, [activeAddress])
 
   const handleClaim = async () => {
-    if (!activeAddress) return
-    setClaimStatus('loading')
-    setClaimError(null)
-    try {
-      const res = await fetch('/api/send-care', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: activeAddress, amount: 30 }),
-      })
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        const raw = data.error ?? ''
-        const friendly = raw.includes('underflow')
-    ? 'Not enough Care-Coins. Thank You for your engagement - we will get in touch.'
-    : raw || 'Claim failed. Please try again.'
-    throw new Error(friendly)
-  }
-      setClaimTxId(data.txId)
-      setClaimStatus('success')
-      setInfo(prev => ({ ...prev, careBalance: (prev.careBalance ?? 0) + 10 }))
-    } catch (e: unknown) {
-      setClaimError(e instanceof Error ? e.message : String(e))
-      setClaimStatus('error')
+  if (!activeAddress) return
+  setClaimStatus('loading')
+  setClaimError(null)
+  try {
+    const res = await fetch('/api/send-care', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: activeAddress, amount: 30 }),
+    })
+    const data = await res.json()
+    if (!res.ok || !data.success) {
+      const raw = data.error ?? ''
+      const friendly = raw.includes('underflow')
+        ? 'Not enough Care-Coins. Thank You for your engagement - we will get in touch.'
+        : raw || 'Claim failed. Please try again.'
+      throw new Error(friendly)  // ✅ throw ist jetzt INNERHALB der if-Klammer
     }
+    setClaimTxId(data.txId)
+    setClaimStatus('success')
+    setInfo(prev => ({ ...prev, careBalance: (prev.careBalance ?? 0) + 30 }))  // ✅ +30
+  } catch (e: unknown) {
+    setClaimError(e instanceof Error ? e.message : String(e))
+    setClaimStatus('error')
   }
+}
 
   const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault()
