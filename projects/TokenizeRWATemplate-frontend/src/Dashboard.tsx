@@ -170,55 +170,55 @@ export default function Dashboard() {
           <p className="mt-2 text-sm text-white/60">CARE tokens earned</p>
         </div>
 
-        {/* Claim */}
+        {/* Claim — nur wenn Balance 0 oder noch nicht geladen */}
         {(info.careBalance === 0 || info.careBalance === null) && !loading && (
-        <div className="rounded-3xl border border-[#ffc2e8]/20 bg-[#ffc2e8]/5 p-7 mb-5">
-          <h3 className="text-lg font-extrabold text-white mb-1">Claim Care Coins</h3>
-          <p className="text-sm text-white/50 mb-5">🌿 You have 10 Care Coins waiting for you.</p>
-          {claimStatus === 'idle' && (
-            <button
-              onClick={handleClaim}
-              className="w-full py-3 rounded-2xl bg-[#fa1179] hover:bg-[#e0006a] text-white font-bold text-sm transition-all"
-            >
-              Claim Care Coins →
-            </button>
-          )}
-          {claimStatus === 'loading' && (
-            <div className="flex items-center gap-3 py-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <p className="text-sm text-white/70">Sending Care Coins to your wallet…</p>
-            </div>
-          )}
-          {claimStatus === 'success' && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-emerald-400 text-xl">✓</span>
-                <p className="text-sm font-semibold text-emerald-400">10 Care Coins sent!</p>
-              </div>
-              {claimTxId && (
-                <a
-                  href={`https://lora.algokit.io/testnet/transaction/${claimTxId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-[#ffc2e8]/60 hover:text-[#ffc2e8] font-mono break-all block transition"
-                >
-                  View on Lora ↗ {claimTxId.slice(0, 20)}...
-                </a>
-              )}
-            </div>
-          )}
-          {claimStatus === 'error' && (
-            <div className="space-y-3">
-              <p className="text-sm text-[#fa1179] bg-[#fa1179]/10 rounded-xl p-3">{claimError}</p>
+          <div className="rounded-3xl border border-[#ffc2e8]/20 bg-[#ffc2e8]/5 p-7 mb-5">
+            <h3 className="text-lg font-extrabold text-white mb-1">Claim Care Coins</h3>
+            <p className="text-sm text-white/50 mb-5">🌿 You have 10 Care Coins waiting for you.</p>
+            {claimStatus === 'idle' && (
               <button
                 onClick={handleClaim}
                 className="w-full py-3 rounded-2xl bg-[#fa1179] hover:bg-[#e0006a] text-white font-bold text-sm transition-all"
               >
-                Try again
+                Claim Care Coins →
               </button>
-            </div>
-          )}
-        </div>
+            )}
+            {claimStatus === 'loading' && (
+              <div className="flex items-center gap-3 py-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <p className="text-sm text-white/70">Sending Care Coins to your wallet…</p>
+              </div>
+            )}
+            {claimStatus === 'success' && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-400 text-xl">✓</span>
+                  <p className="text-sm font-semibold text-emerald-400">10 Care Coins sent!</p>
+                </div>
+                {claimTxId && (
+                  <a
+                    href={`https://lora.algokit.io/testnet/transaction/${claimTxId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#ffc2e8]/60 hover:text-[#ffc2e8] font-mono break-all block transition"
+                  >
+                    View on Lora ↗ {claimTxId.slice(0, 20)}...
+                  </a>
+                )}
+              </div>
+            )}
+            {claimStatus === 'error' && (
+              <div className="space-y-3">
+                <p className="text-sm text-[#fa1179] bg-[#fa1179]/10 rounded-xl p-3">{claimError}</p>
+                <button
+                  onClick={handleClaim}
+                  className="w-full py-3 rounded-2xl bg-[#fa1179] hover:bg-[#e0006a] text-white font-bold text-sm transition-all"
+                >
+                  Try again
+                </button>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Redeem */}
@@ -292,7 +292,7 @@ export default function Dashboard() {
                 {REWARD_CATEGORIES.find(r => r.id === selected)?.label ?? selected}
               </span>
             </p>
-            <p className="text-white/40 text-sm mb-4 leading-relaxed">
+            <p className="text-white/40 text-sm mb-6 leading-relaxed">
               {isRealMode
                 ? 'Your CARE token has been sent back and recorded on-chain.'
                 : 'Your preference is permanently recorded on the blockchain. Thank you! 💛'}
@@ -302,11 +302,22 @@ export default function Dashboard() {
                 href={`https://lora.algokit.io/testnet/transaction/${redeemTxId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-[#ffc2e8]/70 hover:text-[#ffc2e8] font-mono break-all block transition"
+                className="text-xs text-[#ffc2e8]/70 hover:text-[#ffc2e8] font-mono break-all block mb-6 transition"
               >
                 View on Lora ↗ {redeemTxId.slice(0, 20)}...
               </a>
             )}
+            <button
+              onClick={() => {
+                setRedeemStatus('idle')
+                setSelected(null)
+                setCustomIdea('')
+                setRedeemTxId('')
+              }}
+              className="w-full py-3 rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm transition-all"
+            >
+              ← Choose again
+            </button>
           </div>
         )}
 
