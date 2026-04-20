@@ -1,14 +1,21 @@
 import { useWallet } from '@txnlab/use-wallet-react'
+import algosdk from 'algosdk'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useCareCoinOptIn } from './useCareCoinOptIn'
+
+const CARE_ASSET_ID = Number((import.meta as any).env.VITE_CARE_COIN_ASSET_ID)
 
 export default function ThankYou() {
   const navigate = useNavigate()
-  const { activeAddress, isReady } = useWallet()
+  const { activeAddress, signTransactions, isReady } = useWallet()
+  const { status, refetch, algodClient } = useCareCoinOptIn(activeAddress)
 
-  const [claimStatus, setClaimStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [claimError, setClaimError] = useState<string | null>(null)
-  const [txId, setTxId] = useState<string | null>(null)
+  const [localOptedIn, setLocalOptedIn] = useState(false)
+  const [optInLoading, setOptInLoading] = useState(false)
+  const [optInError, setOptInError] = useState<string | null>(null)
+
+  const isOptedIn = localOptedIn || status === 'opted-in'
 
   useEffect(() => {
     if (!isReady) return
@@ -21,24 +28,31 @@ export default function ThankYou() {
     }
   }, [activeAddress])
 
-  const handleClaim = async () => {
+  const handleOptIn = async () => {
     if (!activeAddress) return
-    setClaimStatus('loading')
-    setClaimError(null)
+    setOptInLoading(true)
+    setOptInError(null)
     try {
-      const res = await fetch('/api/send-care', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: activeAddress, amount: 10 }),
-      })
-      const data = await res.json()
-      if (!res.ok || !data.success) throw new Error(data.error ?? 'Claim failed')
-      setTxId(data.txId)
-      setClaimStatus('success')
+      const suggestedParams = await algodClient.getTransactionParams().do()
+      const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+        sender: activeAddress,
+        receiver: activeAddress,
+        amount: 0,
+        assetIndex: CARE_ASSET_ID,
+        suggestedParams,
+      } as any)
+      const signedTxns = await signTransactions([txn])
+      const validTxns = signedTxns.filter((t): t is Uint8Array => t !== null)
+      if (validTxns.length === 0) throw new Error('Wallet signing cancelled')
+      await algodClient.sendRawTransaction(validTxns).do()
+      await algosdk.waitForConfirmation(algodClient, txn.txID().toString(), 4)
+      setLocalOptedIn(true)
+      refetch()
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
-      setClaimError(msg)
-      setClaimStatus('error')
+      console.error('Opt-in error:', e)
+      setOptInError('Opt-in failed. Please check your wallet and try again.')
+    } finally {
+      setOptInLoading(false)
     }
   }
 
@@ -54,72 +68,58 @@ export default function ThankYou() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
       <div className="max-w-lg w-full mx-auto space-y-6 text-center">
 
-        <div className="flex justify-center">
-          <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center" />
-        </div>
-
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-teal-800">Thank you!</h1>
+          <h1 className="text-3xl font-bold text-teal-800">Thank you! 🌿</h1>
           <p className="text-gray-500 text-base leading-relaxed">
-            Your care work has been recorded. Claim your Care Coins below.
+            Your care work has been recorded. Now enable Care Coin to receive your tokens.
           </p>
         </div>
 
-        {/* Claim Button */}
-        <div className="bg-teal-50 border border-teal-100 rounded-2xl p-6 space-y-4">
-          {claimStatus === 'idle' && (
-            <>
-              <p className="text-sm text-teal-700 font-medium">🌿 You have 10 Care Coins waiting for you</p>
+        {/* Opt-in */}
+        {!isOptedIn && (
+          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 space-y-4 text-left">
+            <div className="space-y-1">
+              <h2 className="font-semibold text-gray-800">Enable Care Coin</h2>
+              <p className="text-sm text-gray-500">
+                One quick wallet step so we can send you Care Coins.
+              </p>
+              <p className="text-xs text-gray-400">ⓘ Your wallet needs a tiny ALGO reserve for this.</p>
+            </div>
+            {optInError && (
+              <p className="text-sm text-red-500 bg-red-50 rounded-xl p-3">{optInError}</p>
+            )}
+            {status === 'loading' && !localOptedIn ? (
+              <p className="text-sm text-gray-400 animate-pulse">Checking wallet…</p>
+            ) : (
               <button
-                onClick={handleClaim}
-                className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition-all"
+                onClick={handleOptIn}
+                disabled={optInLoading}
+                className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all"
               >
-                Claim Care Coins →
+                {optInLoading ? 'Confirming in wallet…' : 'Enable Care Coin →'}
               </button>
-            </>
-          )}
-          {claimStatus === 'loading' && (
-            <div className="flex items-center justify-center gap-3 py-2">
-              <span className="w-3 h-3 rounded-full bg-teal-400 animate-pulse inline-block" />
-              <p className="text-sm text-teal-700">Sending Care Coins to your wallet…</p>
-            </div>
-          )}
-          {claimStatus === 'success' && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-emerald-500 text-xl">✓</span>
-                <p className="text-sm font-semibold text-emerald-700">10 Care Coins sent!</p>
-              </div>
-              {txId && <p className="text-xs text-gray-400 font-mono break-all">TxID: {txId}</p>}
-            </div>
-          )}
-          {claimStatus === 'error' && (
-            <div className="space-y-3">
-              <p className="text-sm text-red-600 bg-red-50 rounded-xl p-3">{claimError}</p>
-              <button
-                onClick={handleClaim}
-                className="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition-all"
-              >
-                Try again
-              </button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-all"
-          >
-            View my Dashboard →
-          </button>
-          <button
-            onClick={() => navigate('/redeem')}
-            className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-medium text-sm transition-all"
-          >
-            See Redeem options
-          </button>
-        </div>
+        {/* Success + Dashboard button */}
+        {isOptedIn && (
+          <>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3 text-left">
+              <span className="text-emerald-500 text-xl">✓</span>
+              <div>
+                <p className="text-sm font-semibold text-emerald-800">Care Coin enabled!</p>
+                <p className="text-xs text-emerald-600">Head to your Dashboard to claim your tokens.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full px-6 py-3 rounded-xl bg-[#1333fa] hover:bg-[#fa1179] text-white font-medium text-sm transition-all"
+            >
+              Go to Dashboard →
+            </button>
+          </>
+        )}
 
       </div>
     </div>
