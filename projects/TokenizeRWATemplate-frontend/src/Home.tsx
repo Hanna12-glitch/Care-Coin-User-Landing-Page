@@ -106,7 +106,7 @@ export default function Home() {
               <div className="shrink-0 inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-[#ffc2e8] text-[#141938] font-extrabold text-lg shadow-md mb-4">
                 2
               </div>
-              <h3 className="text-lg font-extrabold text-white mb-2">Log Your Care Work</h3>
+              <h3 className="text-lg font-extrabold text-white mb-2">Register your care status</h3>
               <p className="text-sm text-white/60 leading-relaxed">
                 Tell us about your care work.
               </p>
