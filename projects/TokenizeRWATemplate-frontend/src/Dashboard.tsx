@@ -146,7 +146,7 @@ export default function Dashboard() {
   console.error('[Redeem] Error:', e)
   const raw = e instanceof Error ? e.message : String(e)
   const friendly = raw.includes('underflow')
-    ? 'Your wallet has insufficient ALGO to pay the transaction fee. Please top up your Testnet wallet.'
+    ? 'Your wallet needs to be fed. Please contact us. See button below'
     : 'Transaction failed. Please try again.'
   setRedeemError(friendly)
   setRedeemStatus('error')
