@@ -85,8 +85,8 @@ export default function Redeem() {
       }
 
       setStatus('submitting')
-      const encodedTxn = algosdk.encodeUnsignedTransaction(txn)
-      const signedTxns = await signTransactions([encodedTxn])
+      // Nachher — Transaction-Objekt direkt übergeben
+      const signedTxns = await signTransactions([txn])
       const validTxns = signedTxns.filter((t): t is Uint8Array => t !== null)
       await algod.sendRawTransaction(validTxns[0]).do()
       await algosdk.waitForConfirmation(algod, txn.txID().toString(), 4)
