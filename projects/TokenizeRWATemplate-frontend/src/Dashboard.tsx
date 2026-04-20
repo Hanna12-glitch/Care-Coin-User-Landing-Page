@@ -32,6 +32,7 @@ export default function Dashboard() {
   const [claimStatus, setClaimStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [claimError, setClaimError] = useState<string | null>(null)
   const [claimTxId, setClaimTxId] = useState<string | null>(null)
+  const [hasClaimed, setHasClaimed] = useState(false)
 
   const [selected, setSelected] = useState<string | null>(null)
   const [customIdea, setCustomIdea] = useState('')
@@ -62,50 +63,64 @@ export default function Dashboard() {
           care = holding ? Number(holding.amount) : 0
         }
         setInfo({ algoBalance: algo, careBalance: care })
+
+        // Wenn Wallet bereits Coins hat, dann wurde bereits geclaimt
+        if ((care ?? 0) > 0) {
+          setHasClaimed(true)
+        }
+
         setLoading(false)
       })
       .catch(() => {
         setInfo({ algoBalance: 0, careBalance: 0 })
         setLoading(false)
       })
-  }, [activeAddress])
+  }, [activeAddress, assetId])
 
   const handleClaim = async () => {
-  if (!activeAddress) return
-  setClaimStatus('loading')
-  setClaimError(null)
-  try {
-    const res = await fetch('/api/send-care', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address: activeAddress, amount: 30 }),
-    })
-    const data = await res.json()
-    if (!res.ok || !data.success) {
-      const raw = data.error ?? ''
-      const friendly = raw.includes('underflow')
-        ? 'Not enough Care-Coins. Thank You for your engagement - we will get in touch.'
-        : raw || 'Claim failed. Please try again.'
-      throw new Error(friendly)  // ✅ throw ist jetzt INNERHALB der if-Klammer
+    if (!activeAddress) return
+    setClaimStatus('loading')
+    setClaimError(null)
+
+    try {
+      const res = await fetch('/api/send-care', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: activeAddress, amount: 30 }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        const raw = data.error ?? ''
+        const friendly = raw.includes('underflow')
+          ? 'Not enough Care-Coins. Thank You for your engagement - we will get in touch.'
+          : raw || 'Claim failed. Please try again.'
+        throw new Error(friendly)
+      }
+
+      setClaimTxId(data.txId)
+      setClaimStatus('success')
+      setHasClaimed(true)
+      setInfo(prev => ({ ...prev, careBalance: (prev.careBalance ?? 0) + 30 }))
+    } catch (e: unknown) {
+      setClaimError(e instanceof Error ? e.message : String(e))
+      setClaimStatus('error')
     }
-    setClaimTxId(data.txId)
-    setClaimStatus('success')
-    setInfo(prev => ({ ...prev, careBalance: (prev.careBalance ?? 0) + 30 }))  // ✅ +30
-  } catch (e: unknown) {
-    setClaimError(e instanceof Error ? e.message : String(e))
-    setClaimStatus('error')
   }
-}
 
   const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selected) return
+
     setRedeemStatus('signing')
     setRedeemError('')
+
     try {
       const config = getAlgodConfigFromViteEnvironment()
       const algod = new algosdk.Algodv2(String(config.token), config.server, config.port)
       const suggestedParams = await algod.getTransactionParams().do()
+
       const redeemData = {
         type: 'care-redeem',
         reward: selected,
@@ -113,7 +128,9 @@ export default function Dashboard() {
         timestamp: new Date().toISOString(),
         version: 1,
       }
+
       let txn: algosdk.Transaction
+
       if (isRealMode) {
         txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
           sender: activeAddress!,
@@ -132,25 +149,26 @@ export default function Dashboard() {
           suggestedParams,
         })
       }
+
       setRedeemStatus('submitting')
       const signedTxns = await signTransactions([txn])
       const validTxns = signedTxns.filter((t): t is Uint8Array => t !== null)
+
       await algod.sendRawTransaction(validTxns[0]).do()
       await algosdk.waitForConfirmation(algod, txn.txID().toString(), 4)
+
       setRedeemTxId(txn.txID().toString())
       setRedeemStatus('success')
-      // ✅ Update the displayed Care Balance after a successful redeem
       setInfo(prev => ({ ...prev, careBalance: Math.max(0, (prev.careBalance ?? 0) - 10) }))
-   
     } catch (e: unknown) {
-  console.error('[Redeem] Error:', e)
-  const raw = e instanceof Error ? e.message : String(e)
-  const friendly = raw.includes('underflow')
-    ? 'Your wallet needs to be reacitvated. Please contact us via HELP button below'
-    : 'Transaction failed. Please try again.'
-  setRedeemError(friendly)
-  setRedeemStatus('error')
-}
+      console.error('[Redeem] Error:', e)
+      const raw = e instanceof Error ? e.message : String(e)
+      const friendly = raw.includes('underflow')
+        ? 'Your wallet needs to be reacitvated. Please contact us via HELP button below'
+        : 'Transaction failed. Please try again.'
+      setRedeemError(friendly)
+      setRedeemStatus('error')
+    }
   }
 
   if (!isReady) return (
@@ -180,14 +198,13 @@ export default function Dashboard() {
               {info.careBalance !== null ? info.careBalance : '—'}
             </p>
           )}
-          
         </div>
 
-        {/* Claim — nur wenn Balance 0 oder noch nicht geladen */}
-        {(info.careBalance === 0 || info.careBalance === null) && !loading && (
+        {/* Claim — nur für User, die noch nie geclaimt haben */}
+        {info.careBalance === 0 && !hasClaimed && !loading && (
           <div className="rounded-3xl border border-[#ffc2e8]/20 bg-[#ffc2e8]/5 p-7 mb-5">
             <h3 className="text-lg font-extrabold text-white mb-1">You have 10 Care Coins waiting for you</h3>
-            
+
             {claimStatus === 'idle' && (
               <button
                 onClick={handleClaim}
@@ -196,12 +213,14 @@ export default function Dashboard() {
                 Claim Care Coins →
               </button>
             )}
+
             {claimStatus === 'loading' && (
               <div className="flex items-center gap-3 py-2">
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <p className="text-sm text-white/70">Sending Care Coins to your wallet…</p>
               </div>
             )}
+
             {claimStatus === 'success' && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -220,6 +239,7 @@ export default function Dashboard() {
                 )}
               </div>
             )}
+
             {claimStatus === 'error' && (
               <div className="space-y-3">
                 <p className="text-sm text-[#fa1179] bg-[#fa1179]/10 rounded-xl p-3">{claimError}</p>
@@ -234,6 +254,16 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Empty wallet — wenn bereits geclaimt, aber alles aufgebraucht */}
+        {info.careBalance === 0 && hasClaimed && !loading && (
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-7 mb-5">
+            <h3 className="text-lg font-extrabold text-white mb-1">Your wallet is empty</h3>
+            <p className="text-sm text-white/60">
+              You have used all your Care-Coins.
+            </p>
+          </div>
+        )}
+
         {/* Redeem */}
         {redeemStatus !== 'success' ? (
           <div className="rounded-3xl border border-[#1333fa]/30 bg-[#1333fa]/5 p-7 mb-5">
@@ -244,6 +274,7 @@ export default function Dashboard() {
             <p className="text-sm text-white/50 mb-6">
               Every Reward is 10 Care-Coins. Which would you like most?
             </p>
+
             <form onSubmit={handleRedeem} className="space-y-6">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {REWARD_CATEGORIES.map(reward => (
@@ -262,6 +293,7 @@ export default function Dashboard() {
                   </button>
                 ))}
               </div>
+
               {selected === 'other' && (
                 <div>
                   <label className="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wider">
@@ -277,17 +309,20 @@ export default function Dashboard() {
                   />
                 </div>
               )}
+
               {!isRealMode && (
                 <div className="rounded-2xl border border-[#fb9b0c]/20 bg-[#fb9b0c]/5 p-4 text-xs text-[#fb9b0c]">
                   ⚙️ Simulation mode — your preference is recorded as a blockchain note.
                   Add <code>VITE_CARE_COIN_ASSET_ID</code> + <code>VITE_PROJECT_WALLET_ADDRESS</code> to enable real token transfers.
                 </div>
               )}
+
               {redeemStatus === 'error' && (
                 <div className="rounded-2xl border border-[#fa1179]/30 bg-[#fa1179]/10 p-4 text-sm text-[#fa1179]">
                   {redeemError}
                 </div>
               )}
+
               <button
                 type="submit"
                 disabled={!selected || (selected === 'other' && !customIdea.trim()) || redeemStatus === 'signing' || redeemStatus === 'submitting'}
@@ -301,7 +336,6 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="rounded-3xl border border-blue-500/30 bg-blue-500/5 p-7 mb-5 text-center">
-            
             <h3 className="text-xl font-extrabold text-white mb-2">Thank You for submitting your choice!</h3>
             <h2 className="text-xl font-extrabold text-white mb-2">Your Reward will be send to you via e-mail shortly</h2>
             <p className="text-white/60 mb-2">
@@ -309,7 +343,7 @@ export default function Dashboard() {
                 {REWARD_CATEGORIES.find(r => r.id === selected)?.label ?? selected}
               </span>
             </p>
-            
+
             {redeemTxId && (
               <a
                 href={`https://lora.algokit.io/testnet/transaction/${redeemTxId}`}
@@ -320,6 +354,7 @@ export default function Dashboard() {
                 View on Lora ↗ {redeemTxId.slice(0, 20)}...
               </a>
             )}
+
             <button
               onClick={() => {
                 setRedeemStatus('idle')
@@ -340,7 +375,7 @@ export default function Dashboard() {
           </div>
         )}
 
-              {/* Footer */}
+        {/* Footer */}
         <div className="mt-10 text-center">
           <a
             href="mailto:help@project-care-coin.org"
@@ -349,7 +384,6 @@ export default function Dashboard() {
             HELP
           </a>
         </div>
-
       </div>
     </div>
   )
